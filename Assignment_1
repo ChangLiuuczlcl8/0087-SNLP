@@ -1,0 +1,2174 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Liu-Chang-15043333.ipynb",
+      "version": "0.3.2",
+      "provenance": [],
+      "collapsed_sections": []
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    }
+  },
+  "cells": [
+    {
+      "metadata": {
+        "id": "f0DNj4zyIGKa",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "# Assignment 1\n",
+        "The first assignment has two parts. The first part concerns PyTorch and the second part is about feature engineering for a basic NLP task.\n",
+        "## Instructions\n",
+        "\n",
+        "1.   Make a copy of this notebook \n",
+        "  - Click on \"File -> Save a copy in Drive\" and open it in Colab afterwards\n",
+        "  - **Not recommended!**: Alternatively, download the notebook and work on it on your local machine though keep in mind that you will have to make sure it still runs on Colab afterwards and does not depend on any packages that you installed locally\n",
+        "2.   Rename your notebook to **surname-forename-studentnumber.ipynb**\n",
+        "  - Make sure to exactly follow this naming scheme (don't replace `-` with `_` or something like that)\n",
+        "  - **Failure to comply with this scheme results in -10 points!**\n",
+        "3.   For math exercises, use $\\LaTeX$  to typset your answer\n",
+        "4.   For coding exercises, insert your code at `# TODO` statements\n",
+        "5.   For multiple-choice questions, choose an answer from the drop-down list\n",
+        "6.   Before submitting your notebook, **make sure that it runs without errors when executed from start to end on Colab**\n",
+        "  - To check this, reload your notebook and the Python kernel, and run the notebook from the first to the last cell\n",
+        "  - **If your notebook throws any errors, you will be penalized by -25 points in addition to any penalities from incorrect answers**\n",
+        "  - We are not going to fix any errors (no matter how small) to make your code work\n",
+        "7.  Download your notebook and submit it on Moodle\n",
+        "  - Click on \"File -> Download .ipynb\"\n",
+        "  \n",
+        "\n"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "qvB4c3R4II91",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Notebook Setup [don't change!]"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "d0w7l3EpExU6",
+        "colab_type": "code",
+        "outputId": "46e6d310-808c-47ce-f737-3f85aef1c16f",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "%%shell\n",
+        "pip install torch"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Requirement already satisfied: torch in /usr/local/lib/python3.6/dist-packages (1.0.0)\n"
+          ],
+          "name": "stdout"
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              ""
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 1
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "Pqig2nu9Eztp",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "import torch\n",
+        "from torch import nn\n",
+        "assert torch.__version__ == '1.0.0'"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "C6J4cspjNMdD"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "# Part I: PyTorch [50 points]"
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "YqpgI-WvNMdF"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Linear Algebra [30 points]"
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "fJn6P1nENMdG"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "### PyTorch Tensors [5 points]"
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "RVowRnkNNMdH"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "#### Construct Scaled Identity Matrix [1 point]\n",
+        "Given $n \\in \\mathbb{N}$ and $c \\in \\mathbb{R}$, construct a matrix $\\mathbf{X} \\in \\mathbb{R}^{n\\ \\times\\ n}$ where $\\mathbf{X}$ has $c$ on its diagonal and zeros everywhere else."
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "code",
+        "id": "R5HedJsGNMdK",
+        "outputId": "52dd982b-0f09-47ee-feb2-578de0ff2909",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 85
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "def construct_scaled_identity(n, c):\n",
+        "  dm = c*torch.eye(n,n)\n",
+        "  return dm\n",
+        "\n",
+        "construct_scaled_identity(4, 3.2)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "tensor([[3.2000, 0.0000, 0.0000, 0.0000],\n",
+              "        [0.0000, 3.2000, 0.0000, 0.0000],\n",
+              "        [0.0000, 0.0000, 3.2000, 0.0000],\n",
+              "        [0.0000, 0.0000, 0.0000, 3.2000]])"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 3
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "zuTuxs3NNMdN"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "#### Mean Diagonal [1 point]\n",
+        "Given a square matrix $\\mathbf{X}\\in\\mathbb{R}^{n\\ \\times\\ n}$, return the mean of its diagonal."
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "code",
+        "id": "ZXTiiEfXNMdN",
+        "outputId": "10c2287a-b8ff-404c-b0da-abfde195c3fc",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "def mean_diagonal(x):\n",
+        "  md = torch.einsum('ii->i', [x]).mean()\n",
+        "  return md\n",
+        "\n",
+        "x = torch.arange(0, 16, dtype=torch.float).view(4, 4)\n",
+        "mean_diagonal(x)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "tensor(7.5000)"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 4
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "nwJyhWffNMdR"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "#### Indexing [1 point]\n",
+        "Given a matrix $\\mathbf{X}\\in\\mathbb{R}^{n\\ \\times\\ m}$ and $i,j \\in \\mathbb{N}$, return the submatrix $\\mathbf{Y}\\in\\mathbb{R}^{i\\ \\times\\ j}$ of the last i rows and last j columns of $\\mathbf{X}$ (i.e. the bottom right submatrix of the given size). You can assume that $i \\leq n$ and $j \\leq m$."
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "code",
+        "id": "_t-3LJAaNMdT",
+        "outputId": "c2c2dc87-a918-4f88-c92d-339f76778636",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 51
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "def bottom_right_matrix(x, i, j):\n",
+        "  sm = x[-i:,-j:]\n",
+        "  return sm\n",
+        "\n",
+        "x = torch.arange(0, 12).view(3, 4)\n",
+        "bottom_right_matrix(x, 2, 2)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "tensor([[ 6,  7],\n",
+              "        [10, 11]])"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 5
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "8b_MgbrMNMdY"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "#### Transpose Sum [2 points]\n",
+        "Given a tensor $\\mathcal{X}\\in\\mathbb{R}^{i\\ \\times\\ j\\ \\times\\ k}$, return a transposed tensor $\\mathcal{y}\\in\\mathbb{R}^{j\\ \\times\\ i}$ whose values in the third dimension are summed up."
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "code",
+        "id": "_l_sO_UjNMdY",
+        "outputId": "5162f16d-04cc-4ee8-93bc-fbf30644e1de",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 68
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "def transpose_sum(x):\n",
+        "  tsm = x.sum(2).t()\n",
+        "  return tsm\n",
+        "  \n",
+        "x = torch.arange(0, 12).view(2, 3, 2)\n",
+        "transpose_sum(x)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "tensor([[ 1, 13],\n",
+              "        [ 5, 17],\n",
+              "        [ 9, 21]])"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 6
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "jjvy0cOxNMdc"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "### Matrix-vector Multiplication [10 points]"
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "grswrQwDNMdd"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "Implement five unique ways for multiplying a matrix A with a vector b. **Each PyTorch function is allowed to be used in only one of the five implementations**. For instance, if you use `unsqueeze` in one of the methods, you are not allowed to use it for the other five implementations. Furthermore, functions in `torch` and in `torch.Tensor` are are treated as the same function (i.e. using `torch.add(x, y)`, `x.add(y)` and `x + y` are all treated as the same function and hence are not allowed to be used in more than one implementation). Your code needs to be applicable to any matrix $A \\in \\mathbb{R}^{n\\ \\times\\ m }$ and vector $b\\in\\mathbb{R}^m$."
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "code",
+        "id": "Xb7_j0RPNMde",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "def matrixvector1(A, b):\n",
+        "  v = A @ b\n",
+        "  return v\n",
+        "\n",
+        "def matrixvector2(A, b):\n",
+        "  v = torch.einsum('ij,j->i', [A, b])\n",
+        "  return v\n",
+        "\n",
+        "def matrixvector3(A, b):\n",
+        "  v = torch.mv(A, b)\n",
+        "  return v\n",
+        "\n",
+        "def matrixvector4(A, b):\n",
+        "  v = (A * b).sum(1)\n",
+        "  return v\n",
+        "\n",
+        "def matrixvector5(A, b):\n",
+        "  v = torch.mm(A, b.unsqueeze(1)).squeeze(1)\n",
+        "  return v"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "FXgAd6vfNMdi"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "### Backprop [15 points]"
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "d3xhr10VNMdj"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "#### Forward [2 points]\n",
+        "Implement $\\mathbf{y}\\odot\\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right)$ in PyTorch without using a linear layer implementation (i.e. do the matrix-vector mulitplication and addition of a bias term yourself). Note that we are not looking for a batched implementation, so assume $\\mathbf{y},\\mathbf{b} \\in \\mathbb{R}^n, \\mathbf{x}\\in\\mathbb{R}^m$ and $\\mathbf{W}\\in\\mathbb{R}^{n\\ \\times\\ m}$"
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "code",
+        "id": "qokoTb8KNMdk",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "def fw(y, W, x, b):\n",
+        "  r = y * torch.tanh(W @ x + b)\n",
+        "  return r"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "7b1caDwbNMdl"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "#### Gradient [10 points]\n",
+        "Derive $\\frac{\\partial}{\\partial \\mathbf{x}}\\left[\\mathbf{y}\\odot\\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right)\\right]$ analytically. Make sure to write down all intermediate steps and not just the final result. "
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "O5qJIdsyNMdn"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "\\begin{align}\n",
+        "\\frac{\\partial}{\\partial \\mathbf{x}}\\left[\\mathbf{y}\\odot\\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right)\\right] \n",
+        "&= \\ \\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right)\\odot\\left[\\frac{\\partial\\mathbf{y}}{\\partial \\mathbf{x}}\\right]+\\mathbf{y}\\odot\\left[\\frac{\\partial}{\\partial \\mathbf{x}}\\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right)\\right]\\\\\n",
+        "&= \\ \\mathbf{y}\\odot（\\mathbf{1}-\\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right)\\odot\\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right))\\odot\\left[\\frac{\\partial}{\\partial \\mathbf{x}}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right)\\right]\\\\\n",
+        "&= \\ \\mathbf{y}\\odot（\\mathbf{1}-\\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right)\\odot\\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right))\\odot\\mathbf{W}^T\n",
+        "\\end{align}"
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "fS1dyl5uNMdn"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "#### Backward [3 points]\n",
+        "Implement the calculation for $\\frac{\\partial}{\\partial \\mathbf{x}}\\left[\\mathbf{y}\\odot\\text{tanh}\\left(\\mathbf{W}\\mathbf{x}+\\mathbf{b}\\right)\\right]$  in PyTorch (i.e. without using PyTorch Autograd's `.backward`) using your derivation above."
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "code",
+        "id": "bqxb3aKrNMdo",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "def bw(y, W, x, b, grad_output):\n",
+        "  # followed the notation in slides but not on moodle discuss\n",
+        "  # gradient = local gradient @ upsteam gradient\n",
+        "  # (m, k) = (m, n) @ (n, k)\n",
+        "  # k is 1 in this problem\n",
+        "  result = (y*(1-(torch.tanh(W@x+b))**2)).unsqueeze(0)*W.t()@grad_output\n",
+        "  return result"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "VYtYDeOTNMdq"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## SortBy PyTorch Autograd Function [10 points]"
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "frtS6MAkNMds"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "Implement a PyTorch Autograd function `SortBy` which takes two inputs:\n",
+        "- `x` is a matrix of size `m x n` \n",
+        "- `s` is an accompanying vector of size `m`\n",
+        "\n",
+        "`SortBy` should sort the position of the row vectors in `x` using the accompanying scores in `s` in ascending order. For example, given\n",
+        "$$\n",
+        "\\begin{align}\n",
+        "\\mathbf{X} &= \\left[\\begin{matrix}\n",
+        "0.2 & -0.4 & 0.3\\\\\n",
+        "1.2 & 2.3 & -2.1\\\\\n",
+        "0.1 & -0.1 & 2\n",
+        "\\end{matrix}\\right]\n",
+        "&\\mathbf{s} &=\\left[\\begin{matrix}\n",
+        "0.2\\\\\n",
+        "-0.1\\\\\n",
+        "3\n",
+        "\\end{matrix}\\right]\n",
+        "\\end{align}\n",
+        "$$ the forward pass of `SortBy` should return\n",
+        "$$\n",
+        "\\mathbf{Y} = \\left[\\begin{matrix}\n",
+        "1.2 & 2.3 & -2.1\\\\\n",
+        "0.2 & -0.4 & 0.3\\\\\n",
+        "0.1 & -0.1 & 2\n",
+        "\\end{matrix}\\right]\n",
+        "$$.\n",
+        "\n",
+        "Furthermore, given an upstream gradient `grad_output`  (i.e. a matrix of the same size as X), the backward pass of `SortBy` should calculate the gradient of `x`, effectively rerouting the gradient to the original position of the vectors before sorting. For example, if the first row vector of the upstream gradient  in our example above is a vector $\\mathbf{z}$, the gradient of `x` would have $\\mathbf{z}$ as its second row vector.\n",
+        "\n",
+        "Note that, `SortBy` will only be differentiable w.r.t. to x, and is not be differentiable w.r.t. the sorting procedure to provie a gradient for `s`. **You are not allowed to use any Python loops in your implementation. If you use Python loops for your solution, we will only give you half of the points!**\n",
+        "\n",
+        "Hints:\n",
+        "- You are allowed to use `torch.sort` in your implementation of the forward pass.\n",
+        "- Similarly to the example we had in the lecture, you can use the context `ctx` to save tensors on the forward pass that you might need to reuse on the backward pass."
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "code",
+        "id": "c8SEs6bONMds",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "from torch.autograd import Function\n",
+        "\n",
+        "class SortBy(Function): \n",
+        "  @staticmethod\n",
+        "  def forward(ctx, x, s):\n",
+        "    sorted, indices1 = torch.sort(s)\n",
+        "    ctx.save_for_backward(indices1)\n",
+        "    x = x[indices1, :]\n",
+        "    result = x\n",
+        "    return result\n",
+        "  \n",
+        "  @staticmethod\n",
+        "  def backward(ctx, grad_output):\n",
+        "    indices1, = ctx.saved_tensors\n",
+        "    sorted, indices2 = torch.sort(indices1)\n",
+        "    result2 = grad_output[indices2, :]\n",
+        "    return result2, None\n",
+        "  \n",
+        "x = torch.randn(5, 3, dtype=torch.float, requires_grad=True)\n",
+        "s = torch.randn(5, requires_grad=False)\n",
+        "\n",
+        "x_sorted = SortBy.apply(x, s)\n",
+        "x_sorted.backward(torch.arange(0, 15, dtype=torch.float).view(5, 3))"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "XROrEhjVNMdw"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Multiple Choice Quiz [10 points]\n",
+        "\n",
+        "Answer the following questions by selecting the correct answer (or `None` in case all answers are wrong).\n",
+        "\n",
+        "1. Which of the following operations cannot be calculated using `@`?\n",
+        "2. What is gradient checking for?\n",
+        "3. Why don't we use the finite differences method of gradient checking to calculate gradients instead of using backpropagation?\n",
+        "4. Which of the folllowing operations cannot be expressed as a single einsum string?\n",
+        "5. When should you prefer using `view` instead of `reshape`?\n",
+        "6. Which of the following statements is true if you construct a Pytorch tensor from a NumPy array using `torch.from_numpy`?\n",
+        "7. Which one is a sufficient condition for being able to broadcast an operation between two tensors?\n",
+        "8. What is the defining property of a PyTorch Variable?\n",
+        "9. Given a convex loss function and a sufficiently small learning rate, stochastic gradient descent is guaranteed to?\n",
+        "10. Given a non-convex loss function and a very large learning rate, stochastic gradient descent is guaranteed to?"
+      ]
+    },
+    {
+      "metadata": {
+        "colab_type": "code",
+        "cellView": "both",
+        "id": "4GuNE2o7NMdw",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "#@title Answers { run: \"auto\" }\n",
+        "Q1 = \"None of the above\" #@param [\"Matrix-matrix multiplication\", \"Matrix-vector multiplication\", \"Vector-vector multiplication\", \"Tensor-matrix multiplication\", \"Tensor-vector multiplication\", \"None of the above\"]\n",
+        "Q2 = \"It tests wether the function and its gradient have been implemented correctly\" #@param [\"It tests whether the forward pass of a function is consistent with the backward pass\", \"It is used at runtime to check for numerical instabilities in the backward pass\", \"It tests wether the function and its gradient have been implemented correctly\", \"It tests whether the norm of the gradients of a function are bounded\", \"None of the above\"]\n",
+        "Q3 = \"It would be too slow\" #@param [\"It cannot be used to approximate the gradient accurately enough\", \"It can only be used to calculate the gradient of single functions and not for chained functions which are commonly used in deep learning models\", \"It would be too slow\", \"None of the above\"]\n",
+        "Q4 = \"None of the above\" #@param [\"The transpose of an order-three tensor\", \"The sum of the diagonal of a square matrix\", \"The outer product of two matrices\", \"None of the above\"]\n",
+        "Q5 = \"When the tensor is contiguous\" #@param [\"When the tensor is non-contiguous\", \"When the tensor is contiguous\", \"None of the above\"]\n",
+        "Q6 = \"They point to the same memory and altering one will change the other\" #@param [\"Gradients can be calculated using both, the PyTorch tensor and the NumPy array\", \"They point to the same memory and altering one will change the other\", \"The PyTorch tensor cannot be mapped back to a NumPy array\", \"None of the above\"]\n",
+        "Q7 = \"None of the above\" #@param [\"One of the two tensors is a scalar\", \"One of the tensors has a singleton dimension\", \"The two tensors have the same number of dimensions\", \"None of the above\"]\n",
+        "Q8 = \"A tensor that is part of the computation graph for backpropagation\" #@param [\"A tensor whose values can change during the execution of the program\", \"A tensor that is part of the computation graph for backpropagation\", \"A tensor that can be reassigned to a different tensor\", \"None of the above\"]\n",
+        "Q9 = \"All of the above\" #@param [\"Find a local optimum\", \"Find the global optimum\", \"All of the above\", \"None of the above\"]\n",
+        "Q10 = \"None of the above\" #@param [\"Find a local optimum\", \"Find the global optimum\", \"Converge to a saddle point\", \"All of the above\", \"None of the above\"]"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "colab_type": "text",
+        "id": "FNbdGp3G437M"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "# Part II: Feature Engineering [50 points]\n",
+        "\n",
+        "In this section you will develop a logistic regression model for sentiment prediction.  \n",
+        "\n",
+        "## Setup \n",
+        "First we download the [sentence polarity dataset v1.0](http://www.cs.cornell.edu/people/pabo/movie-review-data/rt-polaritydata.tar.gz) from this [website](http://www.cs.cornell.edu/people/pabo/movie-review-data/) using a few shell commands. "
+      ]
+    },
+    {
+      "metadata": {
+        "id": "qwR7cadCuLD3",
+        "colab_type": "code",
+        "outputId": "b2c88757-ea4c-4130-a10b-dc34864cd396",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 272
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "%%shell\n",
+        "wget http://www.cs.cornell.edu/People/pabo/movie-review-data/rt-polaritydata.tar.gz\n",
+        "tar -xzf rt-polaritydata.tar.gz\n",
+        "mv rt-polaritydata.README.1.0.txt rt-polaritydata\n",
+        "cd rt-polaritydata\n",
+        "iconv -f cp1252 -t utf-8 < rt-polarity.neg > rt-polarity.neg.utf8\n",
+        "iconv -f cp1252 -t utf-8 < rt-polarity.pos > rt-polarity.pos.utf8\n",
+        "perl -ne 'print \"neg\\t\" . $_' <  rt-polarity.neg.utf8 > rt-polarity.neg.utf8.tsv\n",
+        "perl -ne 'print \"pos\\t\" . $_' <  rt-polarity.pos.utf8 > rt-polarity.pos.utf8.tsv\n",
+        "cat rt-polarity.neg.utf8.tsv rt-polarity.pos.utf8.tsv > rt-polarity.utf8.tsv"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "--2019-01-28 19:16:03--  http://www.cs.cornell.edu/People/pabo/movie-review-data/rt-polaritydata.tar.gz\n",
+            "Resolving www.cs.cornell.edu (www.cs.cornell.edu)... 132.236.207.20\n",
+            "Connecting to www.cs.cornell.edu (www.cs.cornell.edu)|132.236.207.20|:80... connected.\n",
+            "HTTP request sent, awaiting response... 301 Moved Permanently\n",
+            "Location: http://www.cs.cornell.edu/people/pabo/movie-review-data/rt-polaritydata.tar.gz [following]\n",
+            "--2019-01-28 19:16:03--  http://www.cs.cornell.edu/people/pabo/movie-review-data/rt-polaritydata.tar.gz\n",
+            "Reusing existing connection to www.cs.cornell.edu:80.\n",
+            "HTTP request sent, awaiting response... 200 OK\n",
+            "Length: 487770 (476K) [application/x-gzip]\n",
+            "Saving to: ‘rt-polaritydata.tar.gz’\n",
+            "\n",
+            "rt-polaritydata.tar 100%[===================>] 476.34K   187KB/s    in 2.6s    \n",
+            "\n",
+            "2019-01-28 19:16:06 (187 KB/s) - ‘rt-polaritydata.tar.gz’ saved [487770/487770]\n",
+            "\n"
+          ],
+          "name": "stdout"
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              ""
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 12
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "ghdXJnhquTpV",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "We install [torchtext](https://github.com/pytorch/text), a simple library to load language data into pytorch compatible format.   "
+      ]
+    },
+    {
+      "metadata": {
+        "id": "VQbP2GT-uXDg",
+        "colab_type": "code",
+        "outputId": "aeb5678f-f261-4a62-e459-fae42bc7e374",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 170
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "%%shell\n",
+        "pip install torchtext"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Requirement already satisfied: torchtext in /usr/local/lib/python3.6/dist-packages (0.3.1)\n",
+            "Requirement already satisfied: tqdm in /usr/local/lib/python3.6/dist-packages (from torchtext) (4.28.1)\n",
+            "Requirement already satisfied: torch in /usr/local/lib/python3.6/dist-packages (from torchtext) (1.0.0)\n",
+            "Requirement already satisfied: requests in /usr/local/lib/python3.6/dist-packages (from torchtext) (2.18.4)\n",
+            "Requirement already satisfied: numpy in /usr/local/lib/python3.6/dist-packages (from torchtext) (1.14.6)\n",
+            "Requirement already satisfied: urllib3<1.23,>=1.21.1 in /usr/local/lib/python3.6/dist-packages (from requests->torchtext) (1.22)\n",
+            "Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.6/dist-packages (from requests->torchtext) (2018.11.29)\n",
+            "Requirement already satisfied: chardet<3.1.0,>=3.0.2 in /usr/local/lib/python3.6/dist-packages (from requests->torchtext) (3.0.4)\n",
+            "Requirement already satisfied: idna<2.7,>=2.5 in /usr/local/lib/python3.6/dist-packages (from requests->torchtext) (2.6)\n"
+          ],
+          "name": "stdout"
+        },
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              ""
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 13
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "ruAcuLbiu23x",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Preprocessing [7pts]\n",
+        "\n",
+        "Load the dataset again, this time fixing all instances where \"Mr.\" have been tokenized as two tokens to instances where \"Mr.\" is a single token. In addition, the preprocessing pipeline should also remove capitalisation. Hint: A look at the data can help you with an optimal implementation of the lowercasing step. \n",
+        "\n",
+        "Implement the above by changing and possibly extending the code below. "
+      ]
+    },
+    {
+      "metadata": {
+        "id": "t0MXky0rvBZK",
+        "colab_type": "code",
+        "outputId": "8461afbb-1dc2-4338-8bd1-bdfebd53cacb",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 34
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "from torchtext import data\n",
+        "\n",
+        "def collapse_mr_dot_and_lowercase(tokens):\n",
+        "  \"\"\"\n",
+        "  Args:\n",
+        "    features: a list of tokens\n",
+        "  \"\"\"\n",
+        "  \n",
+        "  tokens = [x.lower() for x in tokens]\n",
+        "  word = \"mr\"\n",
+        "  index = [i for i in range(len(tokens)) if tokens[i] == word]\n",
+        "  j = 0\n",
+        "  for i in index:\n",
+        "    tokens[i-j] = \"mr.\"\n",
+        "    tokens.pop(i+1-j)\n",
+        "    j += 1\n",
+        "  return tokens\n",
+        "\n",
+        "FEATURES_PRE = data.Field(preprocessing=collapse_mr_dot_and_lowercase)\n",
+        "LABEL_PRE = data.Field(sequential=False, is_target=True, unk_token=None)\n",
+        "rt_polarity_pre = data.TabularDataset(\n",
+        "   path='rt-polaritydata/rt-polarity.utf8.tsv', format='tsv',\n",
+        "   fields=[('label', LABEL_PRE),\n",
+        "           ('features', FEATURES_PRE)])\n",
+        "\n",
+        "FEATURES_PRE.build_vocab(rt_polarity_pre)\n",
+        "LABEL_PRE.build_vocab(rt_polarity_pre)\n",
+        "\n",
+        "# Show one example\n",
+        "rt_polarity_pre[10].features"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['a', 'sentimental', 'mess', 'that', 'never', 'rings', 'true', '.']"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 14
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "3WUsSv2CvpD0",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Logistic Regression\n",
+        "\n",
+        "Below we provide a simple implementation of a model, that combined with the corresponding loss, amounts to logistic regression.   "
+      ]
+    },
+    {
+      "metadata": {
+        "id": "_gztYsQFvqYE",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "import torch\n",
+        "import torch.nn as nn\n",
+        "\n",
+        "PAD_INDEX = 1\n",
+        "\n",
+        "# Model\n",
+        "class LogisticRegression(nn.Module):\n",
+        "    \"\"\"\n",
+        "    Simple Logistic Regression implementation based on torchtext input format.\n",
+        "    \"\"\"\n",
+        "    def __init__(self, num_features):\n",
+        "        super(LogisticRegression, self).__init__()\n",
+        "        self.weights = nn.Parameter(torch.normal(torch.zeros(num_features)), \n",
+        "                                requires_grad=True)\n",
+        "            \n",
+        "    def forward(self, x):\n",
+        "        \"\"\"\n",
+        "        Args:\n",
+        "          x: a batch of input text of shape [max_sentence_length, batch_size]\n",
+        "             using 1 for padding. \n",
+        "        \"\"\"\n",
+        "        # retrieve weights and set those to zero that come from padding cells \n",
+        "        active_tokens_mask = (x != PAD_INDEX).float()   \n",
+        "        filtered = active_tokens_mask * self.weights[x]\n",
+        "        # sum pooling along the token position dimension \n",
+        "        logits = filtered.sum(0)\n",
+        "        return logits\n",
+        "      \n"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "id": "Ilu-HBv8vw_c",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Formulation [5pts]\n",
+        "\n",
+        "In the class we have presented the model as encoder $f(\\mathbf{x})$ follwed by a linear decoder\n",
+        "$$s(\\mathbf{x}) = \\boldsymbol{\\theta}^T  f(\\mathbf{x}) = \\boldsymbol{\\theta}^T \\sum_{w\\in \\mathbf{x}} f(w) $$ where $f(\\mathbf{x})$ is the representation of the input text. \n",
+        "\n",
+        "The implementation here achieves the same output, but the calculation is performed slightly differently due to technical reasons when working with pytorch. Can you give a mathematical description of this implementation here that captures the order in which computation happens? Below $f(w)$ is a one-hot representation of a word, as per lecture 2. \n",
+        "\n",
+        "The candidate answers are:\n",
+        "\n",
+        "1. $s(\\mathbf{x}) = \\left[\\sum_{w\\in \\mathbf{x}}  f(w)  \\right]^T \\boldsymbol{\\theta} $\n",
+        "2. $s(\\mathbf{x}) = \\sum_{w\\in \\mathbf{x}}  \\boldsymbol{\\theta}^T f(w)$\n",
+        "3. $s(\\mathbf{x}) = \\frac{1}{|\\mathbf{x}|}\\boldsymbol{\\theta}^T \\sum_{\\mathbf{x}\\in x}  f(w)$\n",
+        "4. $s(\\mathbf{x}) = \\left[\\sum_{w\\in \\mathbf{x}}  f(w)  \\right]^T \\boldsymbol{\\theta} \\frac{1}{|\\mathbf{x}|} $"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "FjKT0eJzvyw8",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "#@title Answers { run: \"auto\" }\n",
+        "QFormulation = \"Eq 2\" #@param [\"Eq 1\", \"Eq 2\", \"Eq 3\", \"Eq 4\", \"None of the above\"]"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "id": "JDl_i8hvv-4s",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Mean Pooling [8pts]\n",
+        "\n",
+        "Create a new version of the logistic regression module, using mean pooling. "
+      ]
+    },
+    {
+      "metadata": {
+        "id": "Ndq-rzkPwBom",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "# Model\n",
+        "# DO NOT CHANGE THE NAME OR SIGNATURE OF THIS CLASS\n",
+        "class LogisticRegressionMeanPooling(nn.Module):\n",
+        "    \"\"\"\n",
+        "    Simple Logistic Regression implementation based on torchtext input format.\n",
+        "    \"\"\"\n",
+        "    def __init__(self, num_features):\n",
+        "        super(LogisticRegressionMeanPooling, self).__init__()\n",
+        "        self.weights = nn.Parameter(torch.normal(torch.zeros(num_features)), \n",
+        "                                requires_grad=True)\n",
+        "            \n",
+        "    def forward(self, x):\n",
+        "        \"\"\"\n",
+        "        Args:\n",
+        "          x: a batch of input text of shape [max_sentence_length, batch_size]\n",
+        "             using 1 for padding. \n",
+        "        \"\"\"\n",
+        "        # retrieve weights and set those to zero that come from padding cells \n",
+        "        active_tokens_mask = (x != PAD_INDEX).float()   \n",
+        "        filtered = active_tokens_mask * self.weights[x]\n",
+        "        # sum pooling along the token position dimension \n",
+        "        logits = filtered.sum(0)\n",
+        "        logits = logits/active_tokens_mask.sum()\n",
+        "        return logits\n",
+        "      \n"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "id": "IHrFuxc7wH9P",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Add Features [20pts]\n",
+        "\n",
+        "Add the features below to the preprocessing pipeline shown below. \n",
+        "\n",
+        "### Bias Feature [6 pts]\n",
+        "\n",
+        "It is common practice to add a *bias* term of linear classifiers:\n",
+        "\n",
+        "$$s(\\mathbf{x}) = \\boldsymbol{\\theta}^T  f(\\mathbf{x}) + b $$\n",
+        "\n",
+        "One way to achieve this in general is to augment $f(\\mathbf{x}) $ with an extra component that is always set to $1$. In our implementation, this can be achieved by augmenting the `instance.features` field appropriately when loading the data, and setting the `preprocessing` argument in the `Field` constructor. Implement this below.  \n",
+        "\n",
+        "### Bigram Feature [7 pts]\n",
+        "\n",
+        "Use the `preprocessing` pipeline to implement a feature that captures whether word *pairs* $w_1, w_2$ appear consecutively in the sentence.  This feature should be *combined* with the standard unigram and bias features.   \n",
+        "\n",
+        "### Max Pooling [7 pts]\n",
+        "\n",
+        "Use the `preprocessing` pipeline to implement max pooling such that any feature appearing more than once in the sentence is only counted once, as per the lecture slides of week 1. \n"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "soOnYgfswNxe",
+        "colab_type": "code",
+        "outputId": "18b85740-dedd-4a3a-8263-5ab26b4ab2a8",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 306
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "def add_features(features):\n",
+        "  \"\"\"\n",
+        "  Args:\n",
+        "    features: a list of tokens\n",
+        "  \"\"\"\n",
+        "  # Bias Feature\n",
+        "  features.append('1')\n",
+        "  \n",
+        "  # Bigram Feature\n",
+        "  bigram_features = []\n",
+        "  for i, j in enumerate(features[:-2]):\n",
+        "    bigram_features.append(j+features[i+1])\n",
+        "  features.extend(bigram_features)\n",
+        "  \n",
+        "  # Max Pooling\n",
+        "  # the order of the output doesn't matter in this problem\n",
+        "  features = list(set(features))\n",
+        "  \n",
+        "  return features\n",
+        "\n",
+        "FEATURES_2 = data.Field(tokenize=lambda s: s.split(\" \"),preprocessing=add_features)\n",
+        "LABEL_2 = data.Field(sequential=False, is_target=True, unk_token=None)\n",
+        "rt_polarity_2 = data.TabularDataset(\n",
+        "   path='rt-polaritydata/rt-polarity.utf8.tsv', format='tsv',\n",
+        "   fields=[('label', LABEL_2),\n",
+        "           ('features', FEATURES_2)])\n",
+        "\n",
+        "# Show one example\n",
+        "rt_polarity_2[10].features"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['',\n",
+              " 'messthat',\n",
+              " 'never',\n",
+              " '1',\n",
+              " 'ringstrue',\n",
+              " 'true.',\n",
+              " 'mess',\n",
+              " 'a',\n",
+              " 'that',\n",
+              " 'rings',\n",
+              " 'true',\n",
+              " 'sentimental',\n",
+              " 'asentimental',\n",
+              " 'thatnever',\n",
+              " 'neverrings',\n",
+              " 'sentimentalmess',\n",
+              " '.']"
+            ]
+          },
+          "metadata": {
+            "tags": []
+          },
+          "execution_count": 18
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "uMAcvq08wfpa",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Hyperparameters Search and Analysis [10 pts]\n",
+        "\n",
+        "### Early Stopping [5pts]\n",
+        "\n",
+        "Finding the right number of iterations is important (why can running to convergence be bad?). One way to do this is to iterate for a max number K, and then choose the iteration with the largest dev set performance. But this can be slow and unnecessary if we assume that dev-set performance doesn't go up again once it starts to go down (dev set performance concave). Implement a variant of the training loop that implements this idea.  Specifically, the loop should terminate if there has been no increase in development set accuracy when comparing the current accuracy to that from 10 epochs ago. \n",
+        "\n",
+        "### Grid Search [5pts]\n",
+        "Using all the features you developed in the above \"Add Features\" section (or the base model in case you could not address the question), find the best combination of \n",
+        "\n",
+        "* Learning Rate in {1.0, 0.1}\n",
+        "* Number of Training epochs (via early stopping, use 1000 as maximum)\n",
+        "* L2 regularisation weight in {0.001, 0.0001, 0}\n",
+        "\n",
+        "After grid search, the value of the variables `best_acc`, `best_l2`, `best_lr` and `best_epochs` should be appropriately. \n"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "nevKvEv6ww7z",
+        "colab_type": "code",
+        "outputId": "e348cb81-f945-4a0d-edc0-643f7823248c",
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 15538
+        }
+      },
+      "cell_type": "code",
+      "source": [
+        "def accuracy(dataset, model, batch_size=32):\n",
+        "  # Testing the model and returning the accuracy on the given dataset\n",
+        "  total = 0\n",
+        "  correct = 0\n",
+        "  for batch in data.BucketIterator(dataset=dataset, batch_size=batch_size):\n",
+        "      output = model(batch.features)\n",
+        "      total += len(batch.label)\n",
+        "      prediction = (output > 0).long()\n",
+        "      correct += (prediction == batch.label).sum()\n",
+        "\n",
+        "  return float(correct) / total  \n",
+        "\n",
+        "def training_loop(model, train_set, dev_set, num_epochs=100, \n",
+        "                  batch_size=32, lr=0.1, weight_decay=0.0):\n",
+        "  \"\"\"\n",
+        "  Should return the best dev_set accuracy and the number of epochs used. \n",
+        "  \"\"\"\n",
+        "  criterion = torch.nn.BCEWithLogitsLoss()  \n",
+        "  optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=weight_decay)  \n",
+        "  # Training the Model\n",
+        "  epoch_accuracies = []\n",
+        "  best_epoch = 0\n",
+        "  best_accuracy = 0.0\n",
+        "  counts = 10\n",
+        "  for epoch in range(num_epochs):\n",
+        "      for i, batch in enumerate(data.BucketIterator(dataset=train_set, \n",
+        "                                                    batch_size=batch_size)):\n",
+        "          features = batch.features\n",
+        "          labels = batch.label.float()\n",
+        "\n",
+        "          # Forward + Backward + Optimize\n",
+        "          optimizer.zero_grad()\n",
+        "          outputs = model(features)\n",
+        "          loss = criterion(outputs, labels)\n",
+        "          loss.backward()\n",
+        "          optimizer.step()\n",
+        "\n",
+        "          '''\n",
+        "          if (i+1) % 100 == 0:\n",
+        "              print ('Epoch: [%d/%d], Step: [%d/%d], Loss: %.4f, Dev: %.4f' \n",
+        "                     % (epoch+1, num_epochs, i+1, len(train_set)//batch_size, \n",
+        "                        loss.data, accuracy(dev_set, model)))\n",
+        "          '''\n",
+        "      print ('Epoch: [%d/%d], Loss: %.4f, Dev: %.4f' \n",
+        "                     % (epoch+1, num_epochs, loss.data, accuracy(dev_set, model)))\n",
+        "      \n",
+        "      epoch_accuracies.append(accuracy(dev_set, model))\n",
+        "      if epoch_accuracies[-1] > best_accuracy:\n",
+        "          best_accuracy = epoch_accuracies[-1]\n",
+        "          best_epoch = epoch + 1\n",
+        "          counts = 10\n",
+        "      else :\n",
+        "        counts -= 1\n",
+        "        if counts == 0:\n",
+        "          break\n",
+        "        \n",
+        "  return best_accuracy, best_epoch\n",
+        "      \n",
+        "\n",
+        "FEATURES_FREE = data.Field(tokenize=lambda s: s.split(\" \"),preprocessing=add_features)\n",
+        "LABEL_FREE = data.Field(sequential=False, is_target=True, unk_token=None)\n",
+        "rt_polarity_free = data.TabularDataset(\n",
+        "   path='rt-polaritydata/rt-polarity.utf8.tsv', format='tsv',\n",
+        "   fields=[('label', LABEL_FREE),\n",
+        "           ('features', FEATURES_FREE)])\n",
+        "\n",
+        "FEATURES_FREE.build_vocab(rt_polarity_free)\n",
+        "LABEL_FREE.build_vocab(rt_polarity_free)\n",
+        "rt_polarity_free[0].features\n",
+        "\n",
+        "import random\n",
+        "random.seed(10)\n",
+        "rt_train_free, rt_dev_free = rt_polarity_free.split([0.7, 0.3], \n",
+        "                                                    random_state=random.getstate())\n",
+        "\n",
+        "best_acc = 0.0 # best accuracy achieved \n",
+        "best_lr = 0.0 # best learning rate at best accuracy \n",
+        "best_l2 = 0.0 # best l2 regularizing weight\n",
+        "best_epochs = 0 # best number of epochs\n",
+        "\n",
+        "\n",
+        "for LR in [0.1, 1.0]:\n",
+        "  for L2 in [0.001, 0.0001, 0]:\n",
+        "    best_accuracy, best_epoch = training_loop(LogisticRegression(len(FEATURES_FREE.vocab)), rt_train_free, \n",
+        "                                              rt_dev_free, num_epochs=1000, batch_size=32, lr=LR, weight_decay=L2)\n",
+        "    if best_accuracy > best_acc:\n",
+        "      best_acc = best_accuracy\n",
+        "      best_epochs = best_epoch\n",
+        "      best_lr = LR\n",
+        "      best_l2 = L2\n",
+        "\n",
+        "print('Accuracy of the best combination:', best_acc)\n",
+        "print('the best learning rate:', best_lr)\n",
+        "print('the best L2 regularisation weight:', best_l2)\n",
+        "print('the number of epochs:', best_epochs)"
+      ],
+      "execution_count": 0,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "text": [
+            "Epoch: [1/1000], Loss: 1.5131, Dev: 0.5167\n",
+            "Epoch: [2/1000], Loss: 1.4256, Dev: 0.5311\n",
+            "Epoch: [3/1000], Loss: 1.3472, Dev: 0.5336\n",
+            "Epoch: [4/1000], Loss: 1.2738, Dev: 0.5392\n",
+            "Epoch: [5/1000], Loss: 1.2044, Dev: 0.5445\n",
+            "Epoch: [6/1000], Loss: 1.1387, Dev: 0.5489\n",
+            "Epoch: [7/1000], Loss: 1.0770, Dev: 0.5520\n",
+            "Epoch: [8/1000], Loss: 1.0193, Dev: 0.5567\n",
+            "Epoch: [9/1000], Loss: 0.9654, Dev: 0.5608\n",
+            "Epoch: [10/1000], Loss: 0.9151, Dev: 0.5630\n",
+            "Epoch: [11/1000], Loss: 0.8679, Dev: 0.5674\n",
+            "Epoch: [12/1000], Loss: 0.8236, Dev: 0.5711\n",
+            "Epoch: [13/1000], Loss: 0.7818, Dev: 0.5752\n",
+            "Epoch: [14/1000], Loss: 0.7425, Dev: 0.5799\n",
+            "Epoch: [15/1000], Loss: 0.7054, Dev: 0.5805\n",
+            "Epoch: [16/1000], Loss: 0.6704, Dev: 0.5858\n",
+            "Epoch: [17/1000], Loss: 0.6374, Dev: 0.5886\n",
+            "Epoch: [18/1000], Loss: 0.6064, Dev: 0.5914\n",
+            "Epoch: [19/1000], Loss: 0.5773, Dev: 0.5949\n",
+            "Epoch: [20/1000], Loss: 0.5500, Dev: 0.5977\n",
+            "Epoch: [21/1000], Loss: 0.5244, Dev: 0.5986\n",
+            "Epoch: [22/1000], Loss: 0.5005, Dev: 0.5996\n",
+            "Epoch: [23/1000], Loss: 0.4781, Dev: 0.6036\n",
+            "Epoch: [24/1000], Loss: 0.4574, Dev: 0.6052\n",
+            "Epoch: [25/1000], Loss: 0.4380, Dev: 0.6074\n",
+            "Epoch: [26/1000], Loss: 0.4201, Dev: 0.6121\n",
+            "Epoch: [27/1000], Loss: 0.4035, Dev: 0.6149\n",
+            "Epoch: [28/1000], Loss: 0.3882, Dev: 0.6199\n",
+            "Epoch: [29/1000], Loss: 0.3740, Dev: 0.6239\n",
+            "Epoch: [30/1000], Loss: 0.3610, Dev: 0.6258\n",
+            "Epoch: [31/1000], Loss: 0.3489, Dev: 0.6277\n",
+            "Epoch: [32/1000], Loss: 0.3379, Dev: 0.6274\n",
+            "Epoch: [33/1000], Loss: 0.3277, Dev: 0.6296\n",
+            "Epoch: [34/1000], Loss: 0.3184, Dev: 0.6318\n",
+            "Epoch: [35/1000], Loss: 0.3098, Dev: 0.6333\n",
+            "Epoch: [36/1000], Loss: 0.3020, Dev: 0.6339\n",
+            "Epoch: [37/1000], Loss: 0.2948, Dev: 0.6352\n",
+            "Epoch: [38/1000], Loss: 0.2882, Dev: 0.6355\n",
+            "Epoch: [39/1000], Loss: 0.2821, Dev: 0.6355\n",
+            "Epoch: [40/1000], Loss: 0.2766, Dev: 0.6383\n",
+            "Epoch: [41/1000], Loss: 0.2715, Dev: 0.6405\n",
+            "Epoch: [42/1000], Loss: 0.2668, Dev: 0.6418\n",
+            "Epoch: [43/1000], Loss: 0.2626, Dev: 0.6446\n",
+            "Epoch: [44/1000], Loss: 0.2587, Dev: 0.6458\n",
+            "Epoch: [45/1000], Loss: 0.2551, Dev: 0.6474\n",
+            "Epoch: [46/1000], Loss: 0.2519, Dev: 0.6496\n",
+            "Epoch: [47/1000], Loss: 0.2489, Dev: 0.6518\n",
+            "Epoch: [48/1000], Loss: 0.2462, Dev: 0.6546\n",
+            "Epoch: [49/1000], Loss: 0.2438, Dev: 0.6571\n",
+            "Epoch: [50/1000], Loss: 0.2416, Dev: 0.6602\n",
+            "Epoch: [51/1000], Loss: 0.2396, Dev: 0.6627\n",
+            "Epoch: [52/1000], Loss: 0.2378, Dev: 0.6668\n",
+            "Epoch: [53/1000], Loss: 0.2361, Dev: 0.6686\n",
+            "Epoch: [54/1000], Loss: 0.2347, Dev: 0.6708\n",
+            "Epoch: [55/1000], Loss: 0.2333, Dev: 0.6721\n",
+            "Epoch: [56/1000], Loss: 0.2321, Dev: 0.6746\n",
+            "Epoch: [57/1000], Loss: 0.2311, Dev: 0.6783\n",
+            "Epoch: [58/1000], Loss: 0.2301, Dev: 0.6805\n",
+            "Epoch: [59/1000], Loss: 0.2293, Dev: 0.6821\n",
+            "Epoch: [60/1000], Loss: 0.2286, Dev: 0.6824\n",
+            "Epoch: [61/1000], Loss: 0.2279, Dev: 0.6852\n",
+            "Epoch: [62/1000], Loss: 0.2274, Dev: 0.6877\n",
+            "Epoch: [63/1000], Loss: 0.2269, Dev: 0.6899\n",
+            "Epoch: [64/1000], Loss: 0.2265, Dev: 0.6912\n",
+            "Epoch: [65/1000], Loss: 0.2261, Dev: 0.6921\n",
+            "Epoch: [66/1000], Loss: 0.2259, Dev: 0.6930\n",
+            "Epoch: [67/1000], Loss: 0.2256, Dev: 0.6958\n",
+            "Epoch: [68/1000], Loss: 0.2254, Dev: 0.6958\n",
+            "Epoch: [69/1000], Loss: 0.2253, Dev: 0.6971\n",
+            "Epoch: [70/1000], Loss: 0.2252, Dev: 0.6971\n",
+            "Epoch: [71/1000], Loss: 0.2251, Dev: 0.6983\n",
+            "Epoch: [72/1000], Loss: 0.2251, Dev: 0.7002\n",
+            "Epoch: [73/1000], Loss: 0.2251, Dev: 0.7018\n",
+            "Epoch: [74/1000], Loss: 0.2252, Dev: 0.7024\n",
+            "Epoch: [75/1000], Loss: 0.2252, Dev: 0.7024\n",
+            "Epoch: [76/1000], Loss: 0.2253, Dev: 0.7037\n",
+            "Epoch: [77/1000], Loss: 0.2254, Dev: 0.7058\n",
+            "Epoch: [78/1000], Loss: 0.2255, Dev: 0.7052\n",
+            "Epoch: [79/1000], Loss: 0.2257, Dev: 0.7055\n",
+            "Epoch: [80/1000], Loss: 0.2258, Dev: 0.7065\n",
+            "Epoch: [81/1000], Loss: 0.2260, Dev: 0.7099\n",
+            "Epoch: [82/1000], Loss: 0.2262, Dev: 0.7108\n",
+            "Epoch: [83/1000], Loss: 0.2264, Dev: 0.7127\n",
+            "Epoch: [84/1000], Loss: 0.2266, Dev: 0.7130\n",
+            "Epoch: [85/1000], Loss: 0.2268, Dev: 0.7152\n",
+            "Epoch: [86/1000], Loss: 0.2270, Dev: 0.7171\n",
+            "Epoch: [87/1000], Loss: 0.2272, Dev: 0.7177\n",
+            "Epoch: [88/1000], Loss: 0.2274, Dev: 0.7183\n",
+            "Epoch: [89/1000], Loss: 0.2276, Dev: 0.7196\n",
+            "Epoch: [90/1000], Loss: 0.2279, Dev: 0.7190\n",
+            "Epoch: [91/1000], Loss: 0.2281, Dev: 0.7190\n",
+            "Epoch: [92/1000], Loss: 0.2283, Dev: 0.7202\n",
+            "Epoch: [93/1000], Loss: 0.2285, Dev: 0.7205\n",
+            "Epoch: [94/1000], Loss: 0.2288, Dev: 0.7212\n",
+            "Epoch: [95/1000], Loss: 0.2290, Dev: 0.7212\n",
+            "Epoch: [96/1000], Loss: 0.2292, Dev: 0.7246\n",
+            "Epoch: [97/1000], Loss: 0.2294, Dev: 0.7249\n",
+            "Epoch: [98/1000], Loss: 0.2296, Dev: 0.7255\n",
+            "Epoch: [99/1000], Loss: 0.2299, Dev: 0.7259\n",
+            "Epoch: [100/1000], Loss: 0.2301, Dev: 0.7265\n",
+            "Epoch: [101/1000], Loss: 0.2303, Dev: 0.7274\n",
+            "Epoch: [102/1000], Loss: 0.2305, Dev: 0.7277\n",
+            "Epoch: [103/1000], Loss: 0.2307, Dev: 0.7290\n",
+            "Epoch: [104/1000], Loss: 0.2309, Dev: 0.7299\n",
+            "Epoch: [105/1000], Loss: 0.2311, Dev: 0.7293\n",
+            "Epoch: [106/1000], Loss: 0.2313, Dev: 0.7309\n",
+            "Epoch: [107/1000], Loss: 0.2314, Dev: 0.7327\n",
+            "Epoch: [108/1000], Loss: 0.2316, Dev: 0.7312\n",
+            "Epoch: [109/1000], Loss: 0.2318, Dev: 0.7321\n",
+            "Epoch: [110/1000], Loss: 0.2320, Dev: 0.7334\n",
+            "Epoch: [111/1000], Loss: 0.2322, Dev: 0.7334\n",
+            "Epoch: [112/1000], Loss: 0.2323, Dev: 0.7343\n",
+            "Epoch: [113/1000], Loss: 0.2325, Dev: 0.7343\n",
+            "Epoch: [114/1000], Loss: 0.2326, Dev: 0.7349\n",
+            "Epoch: [115/1000], Loss: 0.2328, Dev: 0.7352\n",
+            "Epoch: [116/1000], Loss: 0.2329, Dev: 0.7349\n",
+            "Epoch: [117/1000], Loss: 0.2331, Dev: 0.7343\n",
+            "Epoch: [118/1000], Loss: 0.2332, Dev: 0.7352\n",
+            "Epoch: [119/1000], Loss: 0.2334, Dev: 0.7352\n",
+            "Epoch: [120/1000], Loss: 0.2335, Dev: 0.7355\n",
+            "Epoch: [121/1000], Loss: 0.2336, Dev: 0.7349\n",
+            "Epoch: [122/1000], Loss: 0.2337, Dev: 0.7343\n",
+            "Epoch: [123/1000], Loss: 0.2339, Dev: 0.7355\n",
+            "Epoch: [124/1000], Loss: 0.2340, Dev: 0.7362\n",
+            "Epoch: [125/1000], Loss: 0.2341, Dev: 0.7365\n",
+            "Epoch: [126/1000], Loss: 0.2342, Dev: 0.7362\n",
+            "Epoch: [127/1000], Loss: 0.2343, Dev: 0.7365\n",
+            "Epoch: [128/1000], Loss: 0.2344, Dev: 0.7362\n",
+            "Epoch: [129/1000], Loss: 0.2345, Dev: 0.7359\n",
+            "Epoch: [130/1000], Loss: 0.2346, Dev: 0.7368\n",
+            "Epoch: [131/1000], Loss: 0.2347, Dev: 0.7362\n",
+            "Epoch: [132/1000], Loss: 0.2348, Dev: 0.7365\n",
+            "Epoch: [133/1000], Loss: 0.2349, Dev: 0.7368\n",
+            "Epoch: [134/1000], Loss: 0.2350, Dev: 0.7368\n",
+            "Epoch: [135/1000], Loss: 0.2351, Dev: 0.7374\n",
+            "Epoch: [136/1000], Loss: 0.2352, Dev: 0.7380\n",
+            "Epoch: [137/1000], Loss: 0.2352, Dev: 0.7387\n",
+            "Epoch: [138/1000], Loss: 0.2353, Dev: 0.7399\n",
+            "Epoch: [139/1000], Loss: 0.2354, Dev: 0.7405\n",
+            "Epoch: [140/1000], Loss: 0.2355, Dev: 0.7405\n",
+            "Epoch: [141/1000], Loss: 0.2355, Dev: 0.7396\n",
+            "Epoch: [142/1000], Loss: 0.2356, Dev: 0.7390\n",
+            "Epoch: [143/1000], Loss: 0.2357, Dev: 0.7402\n",
+            "Epoch: [144/1000], Loss: 0.2357, Dev: 0.7409\n",
+            "Epoch: [145/1000], Loss: 0.2358, Dev: 0.7409\n",
+            "Epoch: [146/1000], Loss: 0.2358, Dev: 0.7415\n",
+            "Epoch: [147/1000], Loss: 0.2359, Dev: 0.7415\n",
+            "Epoch: [148/1000], Loss: 0.2360, Dev: 0.7412\n",
+            "Epoch: [149/1000], Loss: 0.2360, Dev: 0.7415\n",
+            "Epoch: [150/1000], Loss: 0.2361, Dev: 0.7412\n",
+            "Epoch: [151/1000], Loss: 0.2361, Dev: 0.7412\n",
+            "Epoch: [152/1000], Loss: 0.2362, Dev: 0.7421\n",
+            "Epoch: [153/1000], Loss: 0.2362, Dev: 0.7421\n",
+            "Epoch: [154/1000], Loss: 0.2362, Dev: 0.7421\n",
+            "Epoch: [155/1000], Loss: 0.2363, Dev: 0.7421\n",
+            "Epoch: [156/1000], Loss: 0.2363, Dev: 0.7421\n",
+            "Epoch: [157/1000], Loss: 0.2364, Dev: 0.7434\n",
+            "Epoch: [158/1000], Loss: 0.2364, Dev: 0.7434\n",
+            "Epoch: [159/1000], Loss: 0.2365, Dev: 0.7443\n",
+            "Epoch: [160/1000], Loss: 0.2365, Dev: 0.7446\n",
+            "Epoch: [161/1000], Loss: 0.2365, Dev: 0.7443\n",
+            "Epoch: [162/1000], Loss: 0.2366, Dev: 0.7443\n",
+            "Epoch: [163/1000], Loss: 0.2366, Dev: 0.7443\n",
+            "Epoch: [164/1000], Loss: 0.2366, Dev: 0.7446\n",
+            "Epoch: [165/1000], Loss: 0.2367, Dev: 0.7449\n",
+            "Epoch: [166/1000], Loss: 0.2367, Dev: 0.7449\n",
+            "Epoch: [167/1000], Loss: 0.2367, Dev: 0.7449\n",
+            "Epoch: [168/1000], Loss: 0.2367, Dev: 0.7449\n",
+            "Epoch: [169/1000], Loss: 0.2368, Dev: 0.7440\n",
+            "Epoch: [170/1000], Loss: 0.2368, Dev: 0.7440\n",
+            "Epoch: [171/1000], Loss: 0.2368, Dev: 0.7437\n",
+            "Epoch: [172/1000], Loss: 0.2369, Dev: 0.7434\n",
+            "Epoch: [173/1000], Loss: 0.2369, Dev: 0.7427\n",
+            "Epoch: [174/1000], Loss: 0.2369, Dev: 0.7424\n",
+            "Epoch: [175/1000], Loss: 0.2369, Dev: 0.7424\n",
+            "Epoch: [1/1000], Loss: 1.5091, Dev: 0.4955\n",
+            "Epoch: [2/1000], Loss: 1.3080, Dev: 0.5083\n",
+            "Epoch: [3/1000], Loss: 1.1595, Dev: 0.5164\n",
+            "Epoch: [4/1000], Loss: 1.0472, Dev: 0.5227\n",
+            "Epoch: [5/1000], Loss: 0.9602, Dev: 0.5277\n",
+            "Epoch: [6/1000], Loss: 0.8918, Dev: 0.5324\n",
+            "Epoch: [7/1000], Loss: 0.8377, Dev: 0.5352\n",
+            "Epoch: [8/1000], Loss: 0.7948, Dev: 0.5402\n",
+            "Epoch: [9/1000], Loss: 0.7602, Dev: 0.5436\n",
+            "Epoch: [10/1000], Loss: 0.7315, Dev: 0.5455\n",
+            "Epoch: [11/1000], Loss: 0.7070, Dev: 0.5489\n",
+            "Epoch: [12/1000], Loss: 0.6856, Dev: 0.5514\n",
+            "Epoch: [13/1000], Loss: 0.6664, Dev: 0.5545\n",
+            "Epoch: [14/1000], Loss: 0.6488, Dev: 0.5555\n",
+            "Epoch: [15/1000], Loss: 0.6326, Dev: 0.5577\n",
+            "Epoch: [16/1000], Loss: 0.6173, Dev: 0.5599\n",
+            "Epoch: [17/1000], Loss: 0.6028, Dev: 0.5617\n",
+            "Epoch: [18/1000], Loss: 0.5890, Dev: 0.5636\n",
+            "Epoch: [19/1000], Loss: 0.5756, Dev: 0.5661\n",
+            "Epoch: [20/1000], Loss: 0.5628, Dev: 0.5702\n",
+            "Epoch: [21/1000], Loss: 0.5503, Dev: 0.5721\n",
+            "Epoch: [22/1000], Loss: 0.5381, Dev: 0.5739\n",
+            "Epoch: [23/1000], Loss: 0.5263, Dev: 0.5755\n",
+            "Epoch: [24/1000], Loss: 0.5148, Dev: 0.5774\n",
+            "Epoch: [25/1000], Loss: 0.5035, Dev: 0.5789\n",
+            "Epoch: [26/1000], Loss: 0.4926, Dev: 0.5799\n",
+            "Epoch: [27/1000], Loss: 0.4818, Dev: 0.5827\n",
+            "Epoch: [28/1000], Loss: 0.4713, Dev: 0.5830\n",
+            "Epoch: [29/1000], Loss: 0.4611, Dev: 0.5852\n",
+            "Epoch: [30/1000], Loss: 0.4511, Dev: 0.5871\n",
+            "Epoch: [31/1000], Loss: 0.4412, Dev: 0.5867\n",
+            "Epoch: [32/1000], Loss: 0.4316, Dev: 0.5896\n",
+            "Epoch: [33/1000], Loss: 0.4222, Dev: 0.5905\n",
+            "Epoch: [34/1000], Loss: 0.4129, Dev: 0.5911\n",
+            "Epoch: [35/1000], Loss: 0.4039, Dev: 0.5914\n",
+            "Epoch: [36/1000], Loss: 0.3951, Dev: 0.5930\n",
+            "Epoch: [37/1000], Loss: 0.3864, Dev: 0.5939\n",
+            "Epoch: [38/1000], Loss: 0.3779, Dev: 0.5955\n",
+            "Epoch: [39/1000], Loss: 0.3696, Dev: 0.5964\n",
+            "Epoch: [40/1000], Loss: 0.3615, Dev: 0.5967\n",
+            "Epoch: [41/1000], Loss: 0.3536, Dev: 0.5980\n",
+            "Epoch: [42/1000], Loss: 0.3459, Dev: 0.5986\n",
+            "Epoch: [43/1000], Loss: 0.3383, Dev: 0.5986\n",
+            "Epoch: [44/1000], Loss: 0.3309, Dev: 0.5986\n",
+            "Epoch: [45/1000], Loss: 0.3237, Dev: 0.5996\n",
+            "Epoch: [46/1000], Loss: 0.3167, Dev: 0.6008\n",
+            "Epoch: [47/1000], Loss: 0.3098, Dev: 0.6018\n",
+            "Epoch: [48/1000], Loss: 0.3031, Dev: 0.6030\n",
+            "Epoch: [49/1000], Loss: 0.2966, Dev: 0.6027\n",
+            "Epoch: [50/1000], Loss: 0.2903, Dev: 0.6033\n",
+            "Epoch: [51/1000], Loss: 0.2841, Dev: 0.6043\n",
+            "Epoch: [52/1000], Loss: 0.2781, Dev: 0.6052\n",
+            "Epoch: [53/1000], Loss: 0.2722, Dev: 0.6058\n",
+            "Epoch: [54/1000], Loss: 0.2665, Dev: 0.6071\n",
+            "Epoch: [55/1000], Loss: 0.2610, Dev: 0.6080\n",
+            "Epoch: [56/1000], Loss: 0.2556, Dev: 0.6099\n",
+            "Epoch: [57/1000], Loss: 0.2504, Dev: 0.6105\n",
+            "Epoch: [58/1000], Loss: 0.2453, Dev: 0.6111\n",
+            "Epoch: [59/1000], Loss: 0.2404, Dev: 0.6118\n",
+            "Epoch: [60/1000], Loss: 0.2357, Dev: 0.6124\n",
+            "Epoch: [61/1000], Loss: 0.2310, Dev: 0.6130\n",
+            "Epoch: [62/1000], Loss: 0.2265, Dev: 0.6127\n",
+            "Epoch: [63/1000], Loss: 0.2222, Dev: 0.6130\n",
+            "Epoch: [64/1000], Loss: 0.2180, Dev: 0.6149\n",
+            "Epoch: [65/1000], Loss: 0.2139, Dev: 0.6152\n",
+            "Epoch: [66/1000], Loss: 0.2099, Dev: 0.6171\n",
+            "Epoch: [67/1000], Loss: 0.2061, Dev: 0.6171\n",
+            "Epoch: [68/1000], Loss: 0.2024, Dev: 0.6180\n",
+            "Epoch: [69/1000], Loss: 0.1987, Dev: 0.6189\n",
+            "Epoch: [70/1000], Loss: 0.1952, Dev: 0.6193\n",
+            "Epoch: [71/1000], Loss: 0.1918, Dev: 0.6202\n",
+            "Epoch: [72/1000], Loss: 0.1885, Dev: 0.6208\n",
+            "Epoch: [73/1000], Loss: 0.1853, Dev: 0.6214\n",
+            "Epoch: [74/1000], Loss: 0.1823, Dev: 0.6211\n",
+            "Epoch: [75/1000], Loss: 0.1792, Dev: 0.6218\n",
+            "Epoch: [76/1000], Loss: 0.1763, Dev: 0.6230\n",
+            "Epoch: [77/1000], Loss: 0.1735, Dev: 0.6230\n",
+            "Epoch: [78/1000], Loss: 0.1708, Dev: 0.6230\n",
+            "Epoch: [79/1000], Loss: 0.1681, Dev: 0.6236\n",
+            "Epoch: [80/1000], Loss: 0.1655, Dev: 0.6243\n",
+            "Epoch: [81/1000], Loss: 0.1630, Dev: 0.6246\n",
+            "Epoch: [82/1000], Loss: 0.1606, Dev: 0.6249\n",
+            "Epoch: [83/1000], Loss: 0.1582, Dev: 0.6249\n",
+            "Epoch: [84/1000], Loss: 0.1559, Dev: 0.6258\n",
+            "Epoch: [85/1000], Loss: 0.1537, Dev: 0.6264\n",
+            "Epoch: [86/1000], Loss: 0.1515, Dev: 0.6271\n",
+            "Epoch: [87/1000], Loss: 0.1494, Dev: 0.6264\n",
+            "Epoch: [88/1000], Loss: 0.1474, Dev: 0.6277\n",
+            "Epoch: [89/1000], Loss: 0.1454, Dev: 0.6286\n",
+            "Epoch: [90/1000], Loss: 0.1435, Dev: 0.6289\n",
+            "Epoch: [91/1000], Loss: 0.1416, Dev: 0.6293\n",
+            "Epoch: [92/1000], Loss: 0.1398, Dev: 0.6293\n",
+            "Epoch: [93/1000], Loss: 0.1381, Dev: 0.6299\n",
+            "Epoch: [94/1000], Loss: 0.1363, Dev: 0.6302\n",
+            "Epoch: [95/1000], Loss: 0.1347, Dev: 0.6305\n",
+            "Epoch: [96/1000], Loss: 0.1330, Dev: 0.6305\n",
+            "Epoch: [97/1000], Loss: 0.1315, Dev: 0.6318\n",
+            "Epoch: [98/1000], Loss: 0.1299, Dev: 0.6324\n",
+            "Epoch: [99/1000], Loss: 0.1284, Dev: 0.6327\n",
+            "Epoch: [100/1000], Loss: 0.1270, Dev: 0.6333\n",
+            "Epoch: [101/1000], Loss: 0.1255, Dev: 0.6333\n",
+            "Epoch: [102/1000], Loss: 0.1242, Dev: 0.6336\n",
+            "Epoch: [103/1000], Loss: 0.1228, Dev: 0.6343\n",
+            "Epoch: [104/1000], Loss: 0.1215, Dev: 0.6346\n",
+            "Epoch: [105/1000], Loss: 0.1202, Dev: 0.6349\n",
+            "Epoch: [106/1000], Loss: 0.1190, Dev: 0.6352\n",
+            "Epoch: [107/1000], Loss: 0.1178, Dev: 0.6355\n",
+            "Epoch: [108/1000], Loss: 0.1166, Dev: 0.6352\n",
+            "Epoch: [109/1000], Loss: 0.1154, Dev: 0.6355\n",
+            "Epoch: [110/1000], Loss: 0.1143, Dev: 0.6361\n",
+            "Epoch: [111/1000], Loss: 0.1132, Dev: 0.6364\n",
+            "Epoch: [112/1000], Loss: 0.1121, Dev: 0.6368\n",
+            "Epoch: [113/1000], Loss: 0.1110, Dev: 0.6371\n",
+            "Epoch: [114/1000], Loss: 0.1100, Dev: 0.6371\n",
+            "Epoch: [115/1000], Loss: 0.1090, Dev: 0.6377\n",
+            "Epoch: [116/1000], Loss: 0.1080, Dev: 0.6377\n",
+            "Epoch: [117/1000], Loss: 0.1071, Dev: 0.6380\n",
+            "Epoch: [118/1000], Loss: 0.1061, Dev: 0.6389\n",
+            "Epoch: [119/1000], Loss: 0.1052, Dev: 0.6383\n",
+            "Epoch: [120/1000], Loss: 0.1043, Dev: 0.6380\n",
+            "Epoch: [121/1000], Loss: 0.1034, Dev: 0.6377\n",
+            "Epoch: [122/1000], Loss: 0.1026, Dev: 0.6383\n",
+            "Epoch: [123/1000], Loss: 0.1017, Dev: 0.6386\n",
+            "Epoch: [124/1000], Loss: 0.1009, Dev: 0.6393\n",
+            "Epoch: [125/1000], Loss: 0.1001, Dev: 0.6402\n",
+            "Epoch: [126/1000], Loss: 0.0993, Dev: 0.6405\n",
+            "Epoch: [127/1000], Loss: 0.0985, Dev: 0.6402\n",
+            "Epoch: [128/1000], Loss: 0.0978, Dev: 0.6405\n",
+            "Epoch: [129/1000], Loss: 0.0970, Dev: 0.6405\n",
+            "Epoch: [130/1000], Loss: 0.0963, Dev: 0.6408\n",
+            "Epoch: [131/1000], Loss: 0.0956, Dev: 0.6408\n",
+            "Epoch: [132/1000], Loss: 0.0949, Dev: 0.6411\n",
+            "Epoch: [133/1000], Loss: 0.0942, Dev: 0.6418\n",
+            "Epoch: [134/1000], Loss: 0.0935, Dev: 0.6421\n",
+            "Epoch: [135/1000], Loss: 0.0929, Dev: 0.6427\n",
+            "Epoch: [136/1000], Loss: 0.0922, Dev: 0.6424\n",
+            "Epoch: [137/1000], Loss: 0.0916, Dev: 0.6424\n",
+            "Epoch: [138/1000], Loss: 0.0910, Dev: 0.6427\n",
+            "Epoch: [139/1000], Loss: 0.0904, Dev: 0.6433\n",
+            "Epoch: [140/1000], Loss: 0.0898, Dev: 0.6433\n",
+            "Epoch: [141/1000], Loss: 0.0892, Dev: 0.6433\n",
+            "Epoch: [142/1000], Loss: 0.0886, Dev: 0.6436\n",
+            "Epoch: [143/1000], Loss: 0.0880, Dev: 0.6446\n",
+            "Epoch: [144/1000], Loss: 0.0875, Dev: 0.6452\n",
+            "Epoch: [145/1000], Loss: 0.0869, Dev: 0.6458\n",
+            "Epoch: [146/1000], Loss: 0.0864, Dev: 0.6465\n",
+            "Epoch: [147/1000], Loss: 0.0859, Dev: 0.6465\n",
+            "Epoch: [148/1000], Loss: 0.0853, Dev: 0.6468\n",
+            "Epoch: [149/1000], Loss: 0.0848, Dev: 0.6471\n",
+            "Epoch: [150/1000], Loss: 0.0843, Dev: 0.6477\n",
+            "Epoch: [151/1000], Loss: 0.0838, Dev: 0.6483\n",
+            "Epoch: [152/1000], Loss: 0.0834, Dev: 0.6480\n",
+            "Epoch: [153/1000], Loss: 0.0829, Dev: 0.6483\n",
+            "Epoch: [154/1000], Loss: 0.0824, Dev: 0.6486\n",
+            "Epoch: [155/1000], Loss: 0.0820, Dev: 0.6490\n",
+            "Epoch: [156/1000], Loss: 0.0815, Dev: 0.6486\n",
+            "Epoch: [157/1000], Loss: 0.0811, Dev: 0.6490\n",
+            "Epoch: [158/1000], Loss: 0.0807, Dev: 0.6486\n",
+            "Epoch: [159/1000], Loss: 0.0802, Dev: 0.6490\n",
+            "Epoch: [160/1000], Loss: 0.0798, Dev: 0.6493\n",
+            "Epoch: [161/1000], Loss: 0.0794, Dev: 0.6496\n",
+            "Epoch: [162/1000], Loss: 0.0790, Dev: 0.6499\n",
+            "Epoch: [163/1000], Loss: 0.0786, Dev: 0.6502\n",
+            "Epoch: [164/1000], Loss: 0.0783, Dev: 0.6502\n",
+            "Epoch: [165/1000], Loss: 0.0779, Dev: 0.6511\n",
+            "Epoch: [166/1000], Loss: 0.0775, Dev: 0.6511\n",
+            "Epoch: [167/1000], Loss: 0.0771, Dev: 0.6511\n",
+            "Epoch: [168/1000], Loss: 0.0768, Dev: 0.6515\n",
+            "Epoch: [169/1000], Loss: 0.0764, Dev: 0.6521\n",
+            "Epoch: [170/1000], Loss: 0.0761, Dev: 0.6518\n",
+            "Epoch: [171/1000], Loss: 0.0757, Dev: 0.6527\n",
+            "Epoch: [172/1000], Loss: 0.0754, Dev: 0.6527\n",
+            "Epoch: [173/1000], Loss: 0.0751, Dev: 0.6530\n",
+            "Epoch: [174/1000], Loss: 0.0748, Dev: 0.6533\n",
+            "Epoch: [175/1000], Loss: 0.0744, Dev: 0.6533\n",
+            "Epoch: [176/1000], Loss: 0.0741, Dev: 0.6530\n",
+            "Epoch: [177/1000], Loss: 0.0738, Dev: 0.6533\n",
+            "Epoch: [178/1000], Loss: 0.0735, Dev: 0.6536\n",
+            "Epoch: [179/1000], Loss: 0.0732, Dev: 0.6540\n",
+            "Epoch: [180/1000], Loss: 0.0729, Dev: 0.6546\n",
+            "Epoch: [181/1000], Loss: 0.0726, Dev: 0.6549\n",
+            "Epoch: [182/1000], Loss: 0.0724, Dev: 0.6552\n",
+            "Epoch: [183/1000], Loss: 0.0721, Dev: 0.6555\n",
+            "Epoch: [184/1000], Loss: 0.0718, Dev: 0.6561\n",
+            "Epoch: [185/1000], Loss: 0.0715, Dev: 0.6561\n",
+            "Epoch: [186/1000], Loss: 0.0713, Dev: 0.6565\n",
+            "Epoch: [187/1000], Loss: 0.0710, Dev: 0.6565\n",
+            "Epoch: [188/1000], Loss: 0.0708, Dev: 0.6565\n",
+            "Epoch: [189/1000], Loss: 0.0705, Dev: 0.6565\n",
+            "Epoch: [190/1000], Loss: 0.0703, Dev: 0.6568\n",
+            "Epoch: [191/1000], Loss: 0.0700, Dev: 0.6568\n",
+            "Epoch: [192/1000], Loss: 0.0698, Dev: 0.6565\n",
+            "Epoch: [193/1000], Loss: 0.0696, Dev: 0.6571\n",
+            "Epoch: [194/1000], Loss: 0.0693, Dev: 0.6571\n",
+            "Epoch: [195/1000], Loss: 0.0691, Dev: 0.6571\n",
+            "Epoch: [196/1000], Loss: 0.0689, Dev: 0.6574\n",
+            "Epoch: [197/1000], Loss: 0.0686, Dev: 0.6577\n",
+            "Epoch: [198/1000], Loss: 0.0684, Dev: 0.6577\n",
+            "Epoch: [199/1000], Loss: 0.0682, Dev: 0.6583\n",
+            "Epoch: [200/1000], Loss: 0.0680, Dev: 0.6590\n",
+            "Epoch: [201/1000], Loss: 0.0678, Dev: 0.6593\n",
+            "Epoch: [202/1000], Loss: 0.0676, Dev: 0.6593\n",
+            "Epoch: [203/1000], Loss: 0.0674, Dev: 0.6593\n",
+            "Epoch: [204/1000], Loss: 0.0672, Dev: 0.6596\n",
+            "Epoch: [205/1000], Loss: 0.0670, Dev: 0.6599\n",
+            "Epoch: [206/1000], Loss: 0.0668, Dev: 0.6599\n",
+            "Epoch: [207/1000], Loss: 0.0666, Dev: 0.6605\n",
+            "Epoch: [208/1000], Loss: 0.0664, Dev: 0.6605\n",
+            "Epoch: [209/1000], Loss: 0.0662, Dev: 0.6605\n",
+            "Epoch: [210/1000], Loss: 0.0661, Dev: 0.6611\n",
+            "Epoch: [211/1000], Loss: 0.0659, Dev: 0.6621\n",
+            "Epoch: [212/1000], Loss: 0.0657, Dev: 0.6624\n",
+            "Epoch: [213/1000], Loss: 0.0655, Dev: 0.6627\n",
+            "Epoch: [214/1000], Loss: 0.0654, Dev: 0.6627\n",
+            "Epoch: [215/1000], Loss: 0.0652, Dev: 0.6621\n",
+            "Epoch: [216/1000], Loss: 0.0650, Dev: 0.6627\n",
+            "Epoch: [217/1000], Loss: 0.0649, Dev: 0.6630\n",
+            "Epoch: [218/1000], Loss: 0.0647, Dev: 0.6627\n",
+            "Epoch: [219/1000], Loss: 0.0646, Dev: 0.6633\n",
+            "Epoch: [220/1000], Loss: 0.0644, Dev: 0.6633\n",
+            "Epoch: [221/1000], Loss: 0.0642, Dev: 0.6636\n",
+            "Epoch: [222/1000], Loss: 0.0641, Dev: 0.6636\n",
+            "Epoch: [223/1000], Loss: 0.0639, Dev: 0.6643\n",
+            "Epoch: [224/1000], Loss: 0.0638, Dev: 0.6649\n",
+            "Epoch: [225/1000], Loss: 0.0636, Dev: 0.6649\n",
+            "Epoch: [226/1000], Loss: 0.0635, Dev: 0.6649\n",
+            "Epoch: [227/1000], Loss: 0.0634, Dev: 0.6649\n",
+            "Epoch: [228/1000], Loss: 0.0632, Dev: 0.6652\n",
+            "Epoch: [229/1000], Loss: 0.0631, Dev: 0.6661\n",
+            "Epoch: [230/1000], Loss: 0.0630, Dev: 0.6665\n",
+            "Epoch: [231/1000], Loss: 0.0628, Dev: 0.6661\n",
+            "Epoch: [232/1000], Loss: 0.0627, Dev: 0.6661\n",
+            "Epoch: [233/1000], Loss: 0.0626, Dev: 0.6671\n",
+            "Epoch: [234/1000], Loss: 0.0624, Dev: 0.6677\n",
+            "Epoch: [235/1000], Loss: 0.0623, Dev: 0.6686\n",
+            "Epoch: [236/1000], Loss: 0.0622, Dev: 0.6683\n",
+            "Epoch: [237/1000], Loss: 0.0621, Dev: 0.6686\n",
+            "Epoch: [238/1000], Loss: 0.0619, Dev: 0.6686\n",
+            "Epoch: [239/1000], Loss: 0.0618, Dev: 0.6686\n",
+            "Epoch: [240/1000], Loss: 0.0617, Dev: 0.6693\n",
+            "Epoch: [241/1000], Loss: 0.0616, Dev: 0.6696\n",
+            "Epoch: [242/1000], Loss: 0.0615, Dev: 0.6699\n",
+            "Epoch: [243/1000], Loss: 0.0614, Dev: 0.6699\n",
+            "Epoch: [244/1000], Loss: 0.0613, Dev: 0.6705\n",
+            "Epoch: [245/1000], Loss: 0.0611, Dev: 0.6708\n",
+            "Epoch: [246/1000], Loss: 0.0610, Dev: 0.6708\n",
+            "Epoch: [247/1000], Loss: 0.0609, Dev: 0.6711\n",
+            "Epoch: [248/1000], Loss: 0.0608, Dev: 0.6711\n",
+            "Epoch: [249/1000], Loss: 0.0607, Dev: 0.6711\n",
+            "Epoch: [250/1000], Loss: 0.0606, Dev: 0.6721\n",
+            "Epoch: [251/1000], Loss: 0.0605, Dev: 0.6721\n",
+            "Epoch: [252/1000], Loss: 0.0604, Dev: 0.6727\n",
+            "Epoch: [253/1000], Loss: 0.0603, Dev: 0.6727\n",
+            "Epoch: [254/1000], Loss: 0.0602, Dev: 0.6727\n",
+            "Epoch: [255/1000], Loss: 0.0601, Dev: 0.6730\n",
+            "Epoch: [256/1000], Loss: 0.0600, Dev: 0.6727\n",
+            "Epoch: [257/1000], Loss: 0.0599, Dev: 0.6727\n",
+            "Epoch: [258/1000], Loss: 0.0599, Dev: 0.6724\n",
+            "Epoch: [259/1000], Loss: 0.0598, Dev: 0.6721\n",
+            "Epoch: [260/1000], Loss: 0.0597, Dev: 0.6730\n",
+            "Epoch: [261/1000], Loss: 0.0596, Dev: 0.6733\n",
+            "Epoch: [262/1000], Loss: 0.0595, Dev: 0.6736\n",
+            "Epoch: [263/1000], Loss: 0.0594, Dev: 0.6740\n",
+            "Epoch: [264/1000], Loss: 0.0593, Dev: 0.6740\n",
+            "Epoch: [265/1000], Loss: 0.0592, Dev: 0.6736\n",
+            "Epoch: [266/1000], Loss: 0.0592, Dev: 0.6743\n",
+            "Epoch: [267/1000], Loss: 0.0591, Dev: 0.6743\n",
+            "Epoch: [268/1000], Loss: 0.0590, Dev: 0.6746\n",
+            "Epoch: [269/1000], Loss: 0.0589, Dev: 0.6746\n",
+            "Epoch: [270/1000], Loss: 0.0589, Dev: 0.6749\n",
+            "Epoch: [271/1000], Loss: 0.0588, Dev: 0.6755\n",
+            "Epoch: [272/1000], Loss: 0.0587, Dev: 0.6761\n",
+            "Epoch: [273/1000], Loss: 0.0586, Dev: 0.6768\n",
+            "Epoch: [274/1000], Loss: 0.0586, Dev: 0.6765\n",
+            "Epoch: [275/1000], Loss: 0.0585, Dev: 0.6765\n",
+            "Epoch: [276/1000], Loss: 0.0584, Dev: 0.6768\n",
+            "Epoch: [277/1000], Loss: 0.0583, Dev: 0.6768\n",
+            "Epoch: [278/1000], Loss: 0.0583, Dev: 0.6771\n",
+            "Epoch: [279/1000], Loss: 0.0582, Dev: 0.6774\n",
+            "Epoch: [280/1000], Loss: 0.0581, Dev: 0.6774\n",
+            "Epoch: [281/1000], Loss: 0.0581, Dev: 0.6774\n",
+            "Epoch: [282/1000], Loss: 0.0580, Dev: 0.6774\n",
+            "Epoch: [283/1000], Loss: 0.0579, Dev: 0.6774\n",
+            "Epoch: [284/1000], Loss: 0.0579, Dev: 0.6771\n",
+            "Epoch: [285/1000], Loss: 0.0578, Dev: 0.6780\n",
+            "Epoch: [286/1000], Loss: 0.0577, Dev: 0.6783\n",
+            "Epoch: [287/1000], Loss: 0.0577, Dev: 0.6783\n",
+            "Epoch: [288/1000], Loss: 0.0576, Dev: 0.6790\n",
+            "Epoch: [289/1000], Loss: 0.0576, Dev: 0.6790\n",
+            "Epoch: [290/1000], Loss: 0.0575, Dev: 0.6790\n",
+            "Epoch: [291/1000], Loss: 0.0574, Dev: 0.6783\n",
+            "Epoch: [292/1000], Loss: 0.0574, Dev: 0.6780\n",
+            "Epoch: [293/1000], Loss: 0.0573, Dev: 0.6783\n",
+            "Epoch: [294/1000], Loss: 0.0573, Dev: 0.6783\n",
+            "Epoch: [295/1000], Loss: 0.0572, Dev: 0.6783\n",
+            "Epoch: [296/1000], Loss: 0.0572, Dev: 0.6786\n",
+            "Epoch: [297/1000], Loss: 0.0571, Dev: 0.6790\n",
+            "Epoch: [298/1000], Loss: 0.0571, Dev: 0.6790\n",
+            "Epoch: [1/1000], Loss: 2.2266, Dev: 0.5336\n",
+            "Epoch: [2/1000], Loss: 2.0273, Dev: 0.5395\n",
+            "Epoch: [3/1000], Loss: 1.8732, Dev: 0.5458\n",
+            "Epoch: [4/1000], Loss: 1.7463, Dev: 0.5524\n",
+            "Epoch: [5/1000], Loss: 1.6371, Dev: 0.5595\n",
+            "Epoch: [6/1000], Loss: 1.5410, Dev: 0.5667\n",
+            "Epoch: [7/1000], Loss: 1.4551, Dev: 0.5721\n",
+            "Epoch: [8/1000], Loss: 1.3777, Dev: 0.5752\n",
+            "Epoch: [9/1000], Loss: 1.3072, Dev: 0.5771\n",
+            "Epoch: [10/1000], Loss: 1.2425, Dev: 0.5805\n",
+            "Epoch: [11/1000], Loss: 1.1827, Dev: 0.5864\n",
+            "Epoch: [12/1000], Loss: 1.1276, Dev: 0.5855\n",
+            "Epoch: [13/1000], Loss: 1.0769, Dev: 0.5880\n",
+            "Epoch: [14/1000], Loss: 1.0300, Dev: 0.5892\n",
+            "Epoch: [15/1000], Loss: 0.9867, Dev: 0.5908\n",
+            "Epoch: [16/1000], Loss: 0.9463, Dev: 0.5921\n",
+            "Epoch: [17/1000], Loss: 0.9087, Dev: 0.5939\n",
+            "Epoch: [18/1000], Loss: 0.8735, Dev: 0.5961\n",
+            "Epoch: [19/1000], Loss: 0.8405, Dev: 0.5964\n",
+            "Epoch: [20/1000], Loss: 0.8094, Dev: 0.5977\n",
+            "Epoch: [21/1000], Loss: 0.7803, Dev: 0.5986\n",
+            "Epoch: [22/1000], Loss: 0.7528, Dev: 0.6021\n",
+            "Epoch: [23/1000], Loss: 0.7268, Dev: 0.6052\n",
+            "Epoch: [24/1000], Loss: 0.7024, Dev: 0.6077\n",
+            "Epoch: [25/1000], Loss: 0.6793, Dev: 0.6086\n",
+            "Epoch: [26/1000], Loss: 0.6575, Dev: 0.6096\n",
+            "Epoch: [27/1000], Loss: 0.6370, Dev: 0.6111\n",
+            "Epoch: [28/1000], Loss: 0.6176, Dev: 0.6136\n",
+            "Epoch: [29/1000], Loss: 0.5992, Dev: 0.6146\n",
+            "Epoch: [30/1000], Loss: 0.5818, Dev: 0.6149\n",
+            "Epoch: [31/1000], Loss: 0.5653, Dev: 0.6183\n",
+            "Epoch: [32/1000], Loss: 0.5497, Dev: 0.6183\n",
+            "Epoch: [33/1000], Loss: 0.5348, Dev: 0.6199\n",
+            "Epoch: [34/1000], Loss: 0.5205, Dev: 0.6205\n",
+            "Epoch: [35/1000], Loss: 0.5069, Dev: 0.6218\n",
+            "Epoch: [36/1000], Loss: 0.4939, Dev: 0.6218\n",
+            "Epoch: [37/1000], Loss: 0.4814, Dev: 0.6230\n",
+            "Epoch: [38/1000], Loss: 0.4694, Dev: 0.6230\n",
+            "Epoch: [39/1000], Loss: 0.4578, Dev: 0.6249\n",
+            "Epoch: [40/1000], Loss: 0.4467, Dev: 0.6258\n",
+            "Epoch: [41/1000], Loss: 0.4360, Dev: 0.6268\n",
+            "Epoch: [42/1000], Loss: 0.4256, Dev: 0.6271\n",
+            "Epoch: [43/1000], Loss: 0.4156, Dev: 0.6280\n",
+            "Epoch: [44/1000], Loss: 0.4059, Dev: 0.6289\n",
+            "Epoch: [45/1000], Loss: 0.3966, Dev: 0.6293\n",
+            "Epoch: [46/1000], Loss: 0.3876, Dev: 0.6305\n",
+            "Epoch: [47/1000], Loss: 0.3789, Dev: 0.6308\n",
+            "Epoch: [48/1000], Loss: 0.3705, Dev: 0.6321\n",
+            "Epoch: [49/1000], Loss: 0.3624, Dev: 0.6321\n",
+            "Epoch: [50/1000], Loss: 0.3547, Dev: 0.6336\n",
+            "Epoch: [51/1000], Loss: 0.3472, Dev: 0.6333\n",
+            "Epoch: [52/1000], Loss: 0.3401, Dev: 0.6327\n",
+            "Epoch: [53/1000], Loss: 0.3332, Dev: 0.6339\n",
+            "Epoch: [54/1000], Loss: 0.3266, Dev: 0.6346\n",
+            "Epoch: [55/1000], Loss: 0.3203, Dev: 0.6355\n",
+            "Epoch: [56/1000], Loss: 0.3143, Dev: 0.6358\n",
+            "Epoch: [57/1000], Loss: 0.3085, Dev: 0.6374\n",
+            "Epoch: [58/1000], Loss: 0.3030, Dev: 0.6383\n",
+            "Epoch: [59/1000], Loss: 0.2977, Dev: 0.6386\n",
+            "Epoch: [60/1000], Loss: 0.2927, Dev: 0.6399\n",
+            "Epoch: [61/1000], Loss: 0.2879, Dev: 0.6402\n",
+            "Epoch: [62/1000], Loss: 0.2832, Dev: 0.6408\n",
+            "Epoch: [63/1000], Loss: 0.2788, Dev: 0.6421\n",
+            "Epoch: [64/1000], Loss: 0.2745, Dev: 0.6436\n",
+            "Epoch: [65/1000], Loss: 0.2704, Dev: 0.6443\n",
+            "Epoch: [66/1000], Loss: 0.2664, Dev: 0.6443\n",
+            "Epoch: [67/1000], Loss: 0.2626, Dev: 0.6455\n",
+            "Epoch: [68/1000], Loss: 0.2589, Dev: 0.6452\n",
+            "Epoch: [69/1000], Loss: 0.2554, Dev: 0.6455\n",
+            "Epoch: [70/1000], Loss: 0.2519, Dev: 0.6468\n",
+            "Epoch: [71/1000], Loss: 0.2486, Dev: 0.6477\n",
+            "Epoch: [72/1000], Loss: 0.2454, Dev: 0.6480\n",
+            "Epoch: [73/1000], Loss: 0.2422, Dev: 0.6477\n",
+            "Epoch: [74/1000], Loss: 0.2392, Dev: 0.6480\n",
+            "Epoch: [75/1000], Loss: 0.2362, Dev: 0.6490\n",
+            "Epoch: [76/1000], Loss: 0.2334, Dev: 0.6493\n",
+            "Epoch: [77/1000], Loss: 0.2306, Dev: 0.6499\n",
+            "Epoch: [78/1000], Loss: 0.2278, Dev: 0.6505\n",
+            "Epoch: [79/1000], Loss: 0.2252, Dev: 0.6502\n",
+            "Epoch: [80/1000], Loss: 0.2226, Dev: 0.6505\n",
+            "Epoch: [81/1000], Loss: 0.2200, Dev: 0.6511\n",
+            "Epoch: [82/1000], Loss: 0.2176, Dev: 0.6515\n",
+            "Epoch: [83/1000], Loss: 0.2151, Dev: 0.6515\n",
+            "Epoch: [84/1000], Loss: 0.2128, Dev: 0.6518\n",
+            "Epoch: [85/1000], Loss: 0.2105, Dev: 0.6527\n",
+            "Epoch: [86/1000], Loss: 0.2082, Dev: 0.6527\n",
+            "Epoch: [87/1000], Loss: 0.2060, Dev: 0.6527\n",
+            "Epoch: [88/1000], Loss: 0.2038, Dev: 0.6530\n",
+            "Epoch: [89/1000], Loss: 0.2017, Dev: 0.6527\n",
+            "Epoch: [90/1000], Loss: 0.1996, Dev: 0.6527\n",
+            "Epoch: [91/1000], Loss: 0.1975, Dev: 0.6527\n",
+            "Epoch: [92/1000], Loss: 0.1955, Dev: 0.6524\n",
+            "Epoch: [93/1000], Loss: 0.1935, Dev: 0.6524\n",
+            "Epoch: [94/1000], Loss: 0.1916, Dev: 0.6530\n",
+            "Epoch: [95/1000], Loss: 0.1896, Dev: 0.6543\n",
+            "Epoch: [96/1000], Loss: 0.1878, Dev: 0.6543\n",
+            "Epoch: [97/1000], Loss: 0.1859, Dev: 0.6549\n",
+            "Epoch: [98/1000], Loss: 0.1841, Dev: 0.6546\n",
+            "Epoch: [99/1000], Loss: 0.1823, Dev: 0.6546\n",
+            "Epoch: [100/1000], Loss: 0.1805, Dev: 0.6549\n",
+            "Epoch: [101/1000], Loss: 0.1788, Dev: 0.6555\n",
+            "Epoch: [102/1000], Loss: 0.1771, Dev: 0.6558\n",
+            "Epoch: [103/1000], Loss: 0.1754, Dev: 0.6561\n",
+            "Epoch: [104/1000], Loss: 0.1737, Dev: 0.6565\n",
+            "Epoch: [105/1000], Loss: 0.1721, Dev: 0.6568\n",
+            "Epoch: [106/1000], Loss: 0.1705, Dev: 0.6571\n",
+            "Epoch: [107/1000], Loss: 0.1689, Dev: 0.6574\n",
+            "Epoch: [108/1000], Loss: 0.1673, Dev: 0.6577\n",
+            "Epoch: [109/1000], Loss: 0.1657, Dev: 0.6580\n",
+            "Epoch: [110/1000], Loss: 0.1642, Dev: 0.6580\n",
+            "Epoch: [111/1000], Loss: 0.1626, Dev: 0.6580\n",
+            "Epoch: [112/1000], Loss: 0.1611, Dev: 0.6577\n",
+            "Epoch: [113/1000], Loss: 0.1596, Dev: 0.6580\n",
+            "Epoch: [114/1000], Loss: 0.1581, Dev: 0.6580\n",
+            "Epoch: [115/1000], Loss: 0.1566, Dev: 0.6586\n",
+            "Epoch: [116/1000], Loss: 0.1552, Dev: 0.6583\n",
+            "Epoch: [117/1000], Loss: 0.1537, Dev: 0.6580\n",
+            "Epoch: [118/1000], Loss: 0.1523, Dev: 0.6583\n",
+            "Epoch: [119/1000], Loss: 0.1509, Dev: 0.6586\n",
+            "Epoch: [120/1000], Loss: 0.1495, Dev: 0.6590\n",
+            "Epoch: [121/1000], Loss: 0.1481, Dev: 0.6590\n",
+            "Epoch: [122/1000], Loss: 0.1467, Dev: 0.6596\n",
+            "Epoch: [123/1000], Loss: 0.1453, Dev: 0.6596\n",
+            "Epoch: [124/1000], Loss: 0.1439, Dev: 0.6602\n",
+            "Epoch: [125/1000], Loss: 0.1426, Dev: 0.6599\n",
+            "Epoch: [126/1000], Loss: 0.1412, Dev: 0.6599\n",
+            "Epoch: [127/1000], Loss: 0.1399, Dev: 0.6596\n",
+            "Epoch: [128/1000], Loss: 0.1386, Dev: 0.6596\n",
+            "Epoch: [129/1000], Loss: 0.1373, Dev: 0.6599\n",
+            "Epoch: [130/1000], Loss: 0.1360, Dev: 0.6605\n",
+            "Epoch: [131/1000], Loss: 0.1347, Dev: 0.6608\n",
+            "Epoch: [132/1000], Loss: 0.1334, Dev: 0.6608\n",
+            "Epoch: [133/1000], Loss: 0.1321, Dev: 0.6608\n",
+            "Epoch: [134/1000], Loss: 0.1309, Dev: 0.6608\n",
+            "Epoch: [135/1000], Loss: 0.1296, Dev: 0.6611\n",
+            "Epoch: [136/1000], Loss: 0.1284, Dev: 0.6608\n",
+            "Epoch: [137/1000], Loss: 0.1272, Dev: 0.6615\n",
+            "Epoch: [138/1000], Loss: 0.1259, Dev: 0.6618\n",
+            "Epoch: [139/1000], Loss: 0.1248, Dev: 0.6618\n",
+            "Epoch: [140/1000], Loss: 0.1236, Dev: 0.6624\n",
+            "Epoch: [141/1000], Loss: 0.1224, Dev: 0.6633\n",
+            "Epoch: [142/1000], Loss: 0.1212, Dev: 0.6636\n",
+            "Epoch: [143/1000], Loss: 0.1201, Dev: 0.6636\n",
+            "Epoch: [144/1000], Loss: 0.1189, Dev: 0.6640\n",
+            "Epoch: [145/1000], Loss: 0.1178, Dev: 0.6640\n",
+            "Epoch: [146/1000], Loss: 0.1167, Dev: 0.6640\n",
+            "Epoch: [147/1000], Loss: 0.1156, Dev: 0.6640\n",
+            "Epoch: [148/1000], Loss: 0.1145, Dev: 0.6640\n",
+            "Epoch: [149/1000], Loss: 0.1134, Dev: 0.6640\n",
+            "Epoch: [150/1000], Loss: 0.1124, Dev: 0.6640\n",
+            "Epoch: [151/1000], Loss: 0.1113, Dev: 0.6636\n",
+            "Epoch: [152/1000], Loss: 0.1103, Dev: 0.6636\n",
+            "Epoch: [153/1000], Loss: 0.1092, Dev: 0.6636\n",
+            "Epoch: [154/1000], Loss: 0.1082, Dev: 0.6643\n",
+            "Epoch: [155/1000], Loss: 0.1072, Dev: 0.6643\n",
+            "Epoch: [156/1000], Loss: 0.1062, Dev: 0.6643\n",
+            "Epoch: [157/1000], Loss: 0.1052, Dev: 0.6643\n",
+            "Epoch: [158/1000], Loss: 0.1042, Dev: 0.6646\n",
+            "Epoch: [159/1000], Loss: 0.1033, Dev: 0.6646\n",
+            "Epoch: [160/1000], Loss: 0.1023, Dev: 0.6646\n",
+            "Epoch: [161/1000], Loss: 0.1014, Dev: 0.6649\n",
+            "Epoch: [162/1000], Loss: 0.1004, Dev: 0.6655\n",
+            "Epoch: [163/1000], Loss: 0.0995, Dev: 0.6658\n",
+            "Epoch: [164/1000], Loss: 0.0986, Dev: 0.6658\n",
+            "Epoch: [165/1000], Loss: 0.0977, Dev: 0.6655\n",
+            "Epoch: [166/1000], Loss: 0.0968, Dev: 0.6655\n",
+            "Epoch: [167/1000], Loss: 0.0959, Dev: 0.6655\n",
+            "Epoch: [168/1000], Loss: 0.0951, Dev: 0.6658\n",
+            "Epoch: [169/1000], Loss: 0.0942, Dev: 0.6655\n",
+            "Epoch: [170/1000], Loss: 0.0933, Dev: 0.6655\n",
+            "Epoch: [171/1000], Loss: 0.0925, Dev: 0.6665\n",
+            "Epoch: [172/1000], Loss: 0.0917, Dev: 0.6661\n",
+            "Epoch: [173/1000], Loss: 0.0909, Dev: 0.6665\n",
+            "Epoch: [174/1000], Loss: 0.0900, Dev: 0.6665\n",
+            "Epoch: [175/1000], Loss: 0.0893, Dev: 0.6665\n",
+            "Epoch: [176/1000], Loss: 0.0885, Dev: 0.6665\n",
+            "Epoch: [177/1000], Loss: 0.0877, Dev: 0.6665\n",
+            "Epoch: [178/1000], Loss: 0.0869, Dev: 0.6665\n",
+            "Epoch: [179/1000], Loss: 0.0862, Dev: 0.6671\n",
+            "Epoch: [180/1000], Loss: 0.0854, Dev: 0.6671\n",
+            "Epoch: [181/1000], Loss: 0.0847, Dev: 0.6671\n",
+            "Epoch: [182/1000], Loss: 0.0839, Dev: 0.6674\n",
+            "Epoch: [183/1000], Loss: 0.0832, Dev: 0.6674\n",
+            "Epoch: [184/1000], Loss: 0.0825, Dev: 0.6677\n",
+            "Epoch: [185/1000], Loss: 0.0818, Dev: 0.6680\n",
+            "Epoch: [186/1000], Loss: 0.0811, Dev: 0.6677\n",
+            "Epoch: [187/1000], Loss: 0.0804, Dev: 0.6674\n",
+            "Epoch: [188/1000], Loss: 0.0797, Dev: 0.6671\n",
+            "Epoch: [189/1000], Loss: 0.0791, Dev: 0.6674\n",
+            "Epoch: [190/1000], Loss: 0.0784, Dev: 0.6677\n",
+            "Epoch: [191/1000], Loss: 0.0777, Dev: 0.6677\n",
+            "Epoch: [192/1000], Loss: 0.0771, Dev: 0.6677\n",
+            "Epoch: [193/1000], Loss: 0.0765, Dev: 0.6677\n",
+            "Epoch: [194/1000], Loss: 0.0758, Dev: 0.6677\n",
+            "Epoch: [195/1000], Loss: 0.0752, Dev: 0.6677\n",
+            "Epoch: [1/1000], Loss: 1.5520, Dev: 0.5661\n",
+            "Epoch: [2/1000], Loss: 0.9398, Dev: 0.6071\n",
+            "Epoch: [3/1000], Loss: 0.5964, Dev: 0.6336\n",
+            "Epoch: [4/1000], Loss: 0.4071, Dev: 0.6533\n",
+            "Epoch: [5/1000], Loss: 0.3137, Dev: 0.6677\n",
+            "Epoch: [6/1000], Loss: 0.2741, Dev: 0.6815\n",
+            "Epoch: [7/1000], Loss: 0.2576, Dev: 0.6965\n",
+            "Epoch: [8/1000], Loss: 0.2507, Dev: 0.7058\n",
+            "Epoch: [9/1000], Loss: 0.2479, Dev: 0.7193\n",
+            "Epoch: [10/1000], Loss: 0.2468, Dev: 0.7255\n",
+            "Epoch: [11/1000], Loss: 0.2463, Dev: 0.7337\n",
+            "Epoch: [12/1000], Loss: 0.2461, Dev: 0.7380\n",
+            "Epoch: [13/1000], Loss: 0.2459, Dev: 0.7371\n",
+            "Epoch: [14/1000], Loss: 0.2458, Dev: 0.7393\n",
+            "Epoch: [15/1000], Loss: 0.2457, Dev: 0.7377\n",
+            "Epoch: [16/1000], Loss: 0.2456, Dev: 0.7384\n",
+            "Epoch: [17/1000], Loss: 0.2455, Dev: 0.7380\n",
+            "Epoch: [18/1000], Loss: 0.2454, Dev: 0.7377\n",
+            "Epoch: [19/1000], Loss: 0.2453, Dev: 0.7355\n",
+            "Epoch: [20/1000], Loss: 0.2453, Dev: 0.7352\n",
+            "Epoch: [21/1000], Loss: 0.2453, Dev: 0.7346\n",
+            "Epoch: [22/1000], Loss: 0.2452, Dev: 0.7362\n",
+            "Epoch: [23/1000], Loss: 0.2452, Dev: 0.7352\n",
+            "Epoch: [24/1000], Loss: 0.2452, Dev: 0.7346\n",
+            "Epoch: [1/1000], Loss: 1.8238, Dev: 0.5530\n",
+            "Epoch: [2/1000], Loss: 1.2807, Dev: 0.5792\n",
+            "Epoch: [3/1000], Loss: 0.8552, Dev: 0.6018\n",
+            "Epoch: [4/1000], Loss: 0.5651, Dev: 0.6149\n",
+            "Epoch: [5/1000], Loss: 0.3846, Dev: 0.6249\n",
+            "Epoch: [6/1000], Loss: 0.2796, Dev: 0.6327\n",
+            "Epoch: [7/1000], Loss: 0.2159, Dev: 0.6349\n",
+            "Epoch: [8/1000], Loss: 0.1732, Dev: 0.6389\n",
+            "Epoch: [9/1000], Loss: 0.1432, Dev: 0.6440\n",
+            "Epoch: [10/1000], Loss: 0.1221, Dev: 0.6502\n",
+            "Epoch: [11/1000], Loss: 0.1071, Dev: 0.6543\n",
+            "Epoch: [12/1000], Loss: 0.0961, Dev: 0.6565\n",
+            "Epoch: [13/1000], Loss: 0.0880, Dev: 0.6580\n",
+            "Epoch: [14/1000], Loss: 0.0820, Dev: 0.6605\n",
+            "Epoch: [15/1000], Loss: 0.0774, Dev: 0.6633\n",
+            "Epoch: [16/1000], Loss: 0.0739, Dev: 0.6646\n",
+            "Epoch: [17/1000], Loss: 0.0711, Dev: 0.6690\n",
+            "Epoch: [18/1000], Loss: 0.0689, Dev: 0.6693\n",
+            "Epoch: [19/1000], Loss: 0.0670, Dev: 0.6711\n",
+            "Epoch: [20/1000], Loss: 0.0654, Dev: 0.6727\n",
+            "Epoch: [21/1000], Loss: 0.0641, Dev: 0.6743\n",
+            "Epoch: [22/1000], Loss: 0.0630, Dev: 0.6768\n",
+            "Epoch: [23/1000], Loss: 0.0620, Dev: 0.6793\n",
+            "Epoch: [24/1000], Loss: 0.0612, Dev: 0.6818\n",
+            "Epoch: [25/1000], Loss: 0.0605, Dev: 0.6830\n",
+            "Epoch: [26/1000], Loss: 0.0600, Dev: 0.6840\n",
+            "Epoch: [27/1000], Loss: 0.0594, Dev: 0.6874\n",
+            "Epoch: [28/1000], Loss: 0.0590, Dev: 0.6896\n",
+            "Epoch: [29/1000], Loss: 0.0587, Dev: 0.6908\n",
+            "Epoch: [30/1000], Loss: 0.0583, Dev: 0.6937\n",
+            "Epoch: [31/1000], Loss: 0.0581, Dev: 0.6971\n",
+            "Epoch: [32/1000], Loss: 0.0578, Dev: 0.6987\n",
+            "Epoch: [33/1000], Loss: 0.0576, Dev: 0.7018\n",
+            "Epoch: [34/1000], Loss: 0.0575, Dev: 0.7030\n",
+            "Epoch: [35/1000], Loss: 0.0573, Dev: 0.7043\n",
+            "Epoch: [36/1000], Loss: 0.0572, Dev: 0.7049\n",
+            "Epoch: [37/1000], Loss: 0.0571, Dev: 0.7058\n",
+            "Epoch: [38/1000], Loss: 0.0570, Dev: 0.7080\n",
+            "Epoch: [39/1000], Loss: 0.0570, Dev: 0.7090\n",
+            "Epoch: [40/1000], Loss: 0.0569, Dev: 0.7096\n",
+            "Epoch: [41/1000], Loss: 0.0569, Dev: 0.7137\n",
+            "Epoch: [42/1000], Loss: 0.0568, Dev: 0.7140\n",
+            "Epoch: [43/1000], Loss: 0.0568, Dev: 0.7152\n",
+            "Epoch: [44/1000], Loss: 0.0568, Dev: 0.7168\n",
+            "Epoch: [45/1000], Loss: 0.0568, Dev: 0.7180\n",
+            "Epoch: [46/1000], Loss: 0.0568, Dev: 0.7199\n",
+            "Epoch: [47/1000], Loss: 0.0568, Dev: 0.7212\n",
+            "Epoch: [48/1000], Loss: 0.0568, Dev: 0.7234\n",
+            "Epoch: [49/1000], Loss: 0.0568, Dev: 0.7249\n",
+            "Epoch: [50/1000], Loss: 0.0568, Dev: 0.7255\n",
+            "Epoch: [51/1000], Loss: 0.0568, Dev: 0.7271\n",
+            "Epoch: [52/1000], Loss: 0.0568, Dev: 0.7284\n",
+            "Epoch: [53/1000], Loss: 0.0568, Dev: 0.7302\n",
+            "Epoch: [54/1000], Loss: 0.0569, Dev: 0.7305\n",
+            "Epoch: [55/1000], Loss: 0.0569, Dev: 0.7324\n",
+            "Epoch: [56/1000], Loss: 0.0569, Dev: 0.7337\n",
+            "Epoch: [57/1000], Loss: 0.0569, Dev: 0.7349\n",
+            "Epoch: [58/1000], Loss: 0.0569, Dev: 0.7365\n",
+            "Epoch: [59/1000], Loss: 0.0570, Dev: 0.7359\n",
+            "Epoch: [60/1000], Loss: 0.0570, Dev: 0.7368\n",
+            "Epoch: [61/1000], Loss: 0.0570, Dev: 0.7368\n",
+            "Epoch: [62/1000], Loss: 0.0570, Dev: 0.7384\n",
+            "Epoch: [63/1000], Loss: 0.0570, Dev: 0.7396\n",
+            "Epoch: [64/1000], Loss: 0.0571, Dev: 0.7409\n",
+            "Epoch: [65/1000], Loss: 0.0571, Dev: 0.7424\n",
+            "Epoch: [66/1000], Loss: 0.0571, Dev: 0.7437\n",
+            "Epoch: [67/1000], Loss: 0.0571, Dev: 0.7446\n",
+            "Epoch: [68/1000], Loss: 0.0571, Dev: 0.7459\n",
+            "Epoch: [69/1000], Loss: 0.0571, Dev: 0.7468\n",
+            "Epoch: [70/1000], Loss: 0.0572, Dev: 0.7499\n",
+            "Epoch: [71/1000], Loss: 0.0572, Dev: 0.7493\n",
+            "Epoch: [72/1000], Loss: 0.0572, Dev: 0.7490\n",
+            "Epoch: [73/1000], Loss: 0.0572, Dev: 0.7505\n",
+            "Epoch: [74/1000], Loss: 0.0572, Dev: 0.7515\n",
+            "Epoch: [75/1000], Loss: 0.0572, Dev: 0.7521\n",
+            "Epoch: [76/1000], Loss: 0.0572, Dev: 0.7521\n",
+            "Epoch: [77/1000], Loss: 0.0573, Dev: 0.7534\n",
+            "Epoch: [78/1000], Loss: 0.0573, Dev: 0.7527\n",
+            "Epoch: [79/1000], Loss: 0.0573, Dev: 0.7537\n",
+            "Epoch: [80/1000], Loss: 0.0573, Dev: 0.7540\n",
+            "Epoch: [81/1000], Loss: 0.0573, Dev: 0.7540\n",
+            "Epoch: [82/1000], Loss: 0.0573, Dev: 0.7552\n",
+            "Epoch: [83/1000], Loss: 0.0573, Dev: 0.7562\n",
+            "Epoch: [84/1000], Loss: 0.0573, Dev: 0.7555\n",
+            "Epoch: [85/1000], Loss: 0.0573, Dev: 0.7559\n",
+            "Epoch: [86/1000], Loss: 0.0574, Dev: 0.7549\n",
+            "Epoch: [87/1000], Loss: 0.0574, Dev: 0.7562\n",
+            "Epoch: [88/1000], Loss: 0.0574, Dev: 0.7559\n",
+            "Epoch: [89/1000], Loss: 0.0574, Dev: 0.7559\n",
+            "Epoch: [90/1000], Loss: 0.0574, Dev: 0.7562\n",
+            "Epoch: [91/1000], Loss: 0.0574, Dev: 0.7565\n",
+            "Epoch: [92/1000], Loss: 0.0574, Dev: 0.7555\n",
+            "Epoch: [93/1000], Loss: 0.0574, Dev: 0.7565\n",
+            "Epoch: [94/1000], Loss: 0.0574, Dev: 0.7577\n",
+            "Epoch: [95/1000], Loss: 0.0574, Dev: 0.7574\n",
+            "Epoch: [96/1000], Loss: 0.0574, Dev: 0.7577\n",
+            "Epoch: [97/1000], Loss: 0.0574, Dev: 0.7574\n",
+            "Epoch: [98/1000], Loss: 0.0574, Dev: 0.7571\n",
+            "Epoch: [99/1000], Loss: 0.0574, Dev: 0.7565\n",
+            "Epoch: [100/1000], Loss: 0.0574, Dev: 0.7568\n",
+            "Epoch: [101/1000], Loss: 0.0574, Dev: 0.7571\n",
+            "Epoch: [102/1000], Loss: 0.0574, Dev: 0.7574\n",
+            "Epoch: [103/1000], Loss: 0.0575, Dev: 0.7574\n",
+            "Epoch: [104/1000], Loss: 0.0575, Dev: 0.7568\n",
+            "Epoch: [1/1000], Loss: 1.4729, Dev: 0.5539\n",
+            "Epoch: [2/1000], Loss: 0.9887, Dev: 0.5833\n",
+            "Epoch: [3/1000], Loss: 0.6890, Dev: 0.6027\n",
+            "Epoch: [4/1000], Loss: 0.4751, Dev: 0.6143\n",
+            "Epoch: [5/1000], Loss: 0.3228, Dev: 0.6168\n",
+            "Epoch: [6/1000], Loss: 0.2234, Dev: 0.6239\n",
+            "Epoch: [7/1000], Loss: 0.1663, Dev: 0.6261\n",
+            "Epoch: [8/1000], Loss: 0.1339, Dev: 0.6302\n",
+            "Epoch: [9/1000], Loss: 0.1127, Dev: 0.6283\n",
+            "Epoch: [10/1000], Loss: 0.0976, Dev: 0.6286\n",
+            "Epoch: [11/1000], Loss: 0.0861, Dev: 0.6324\n",
+            "Epoch: [12/1000], Loss: 0.0770, Dev: 0.6346\n",
+            "Epoch: [13/1000], Loss: 0.0694, Dev: 0.6371\n",
+            "Epoch: [14/1000], Loss: 0.0630, Dev: 0.6377\n",
+            "Epoch: [15/1000], Loss: 0.0574, Dev: 0.6396\n",
+            "Epoch: [16/1000], Loss: 0.0526, Dev: 0.6405\n",
+            "Epoch: [17/1000], Loss: 0.0486, Dev: 0.6421\n",
+            "Epoch: [18/1000], Loss: 0.0452, Dev: 0.6424\n",
+            "Epoch: [19/1000], Loss: 0.0423, Dev: 0.6436\n",
+            "Epoch: [20/1000], Loss: 0.0398, Dev: 0.6443\n",
+            "Epoch: [21/1000], Loss: 0.0376, Dev: 0.6455\n",
+            "Epoch: [22/1000], Loss: 0.0357, Dev: 0.6468\n",
+            "Epoch: [23/1000], Loss: 0.0340, Dev: 0.6474\n",
+            "Epoch: [24/1000], Loss: 0.0325, Dev: 0.6486\n",
+            "Epoch: [25/1000], Loss: 0.0311, Dev: 0.6493\n",
+            "Epoch: [26/1000], Loss: 0.0299, Dev: 0.6511\n",
+            "Epoch: [27/1000], Loss: 0.0287, Dev: 0.6511\n",
+            "Epoch: [28/1000], Loss: 0.0276, Dev: 0.6527\n",
+            "Epoch: [29/1000], Loss: 0.0266, Dev: 0.6536\n",
+            "Epoch: [30/1000], Loss: 0.0257, Dev: 0.6540\n",
+            "Epoch: [31/1000], Loss: 0.0248, Dev: 0.6561\n",
+            "Epoch: [32/1000], Loss: 0.0240, Dev: 0.6571\n",
+            "Epoch: [33/1000], Loss: 0.0232, Dev: 0.6574\n",
+            "Epoch: [34/1000], Loss: 0.0224, Dev: 0.6590\n",
+            "Epoch: [35/1000], Loss: 0.0218, Dev: 0.6602\n",
+            "Epoch: [36/1000], Loss: 0.0211, Dev: 0.6608\n",
+            "Epoch: [37/1000], Loss: 0.0205, Dev: 0.6627\n",
+            "Epoch: [38/1000], Loss: 0.0200, Dev: 0.6621\n",
+            "Epoch: [39/1000], Loss: 0.0194, Dev: 0.6630\n",
+            "Epoch: [40/1000], Loss: 0.0189, Dev: 0.6624\n",
+            "Epoch: [41/1000], Loss: 0.0184, Dev: 0.6630\n",
+            "Epoch: [42/1000], Loss: 0.0180, Dev: 0.6630\n",
+            "Epoch: [43/1000], Loss: 0.0176, Dev: 0.6636\n",
+            "Epoch: [44/1000], Loss: 0.0172, Dev: 0.6636\n",
+            "Epoch: [45/1000], Loss: 0.0168, Dev: 0.6640\n",
+            "Epoch: [46/1000], Loss: 0.0164, Dev: 0.6640\n",
+            "Epoch: [47/1000], Loss: 0.0161, Dev: 0.6646\n",
+            "Epoch: [48/1000], Loss: 0.0157, Dev: 0.6658\n",
+            "Epoch: [49/1000], Loss: 0.0154, Dev: 0.6661\n",
+            "Epoch: [50/1000], Loss: 0.0151, Dev: 0.6665\n",
+            "Epoch: [51/1000], Loss: 0.0148, Dev: 0.6665\n",
+            "Epoch: [52/1000], Loss: 0.0145, Dev: 0.6665\n",
+            "Epoch: [53/1000], Loss: 0.0142, Dev: 0.6671\n",
+            "Epoch: [54/1000], Loss: 0.0140, Dev: 0.6677\n",
+            "Epoch: [55/1000], Loss: 0.0137, Dev: 0.6683\n",
+            "Epoch: [56/1000], Loss: 0.0135, Dev: 0.6680\n",
+            "Epoch: [57/1000], Loss: 0.0133, Dev: 0.6686\n",
+            "Epoch: [58/1000], Loss: 0.0130, Dev: 0.6696\n",
+            "Epoch: [59/1000], Loss: 0.0128, Dev: 0.6699\n",
+            "Epoch: [60/1000], Loss: 0.0126, Dev: 0.6699\n",
+            "Epoch: [61/1000], Loss: 0.0124, Dev: 0.6702\n",
+            "Epoch: [62/1000], Loss: 0.0122, Dev: 0.6705\n",
+            "Epoch: [63/1000], Loss: 0.0120, Dev: 0.6705\n",
+            "Epoch: [64/1000], Loss: 0.0119, Dev: 0.6705\n",
+            "Epoch: [65/1000], Loss: 0.0117, Dev: 0.6708\n",
+            "Epoch: [66/1000], Loss: 0.0115, Dev: 0.6708\n",
+            "Epoch: [67/1000], Loss: 0.0113, Dev: 0.6711\n",
+            "Epoch: [68/1000], Loss: 0.0112, Dev: 0.6718\n",
+            "Epoch: [69/1000], Loss: 0.0110, Dev: 0.6721\n",
+            "Epoch: [70/1000], Loss: 0.0109, Dev: 0.6724\n",
+            "Epoch: [71/1000], Loss: 0.0107, Dev: 0.6724\n",
+            "Epoch: [72/1000], Loss: 0.0106, Dev: 0.6721\n",
+            "Epoch: [73/1000], Loss: 0.0104, Dev: 0.6721\n",
+            "Epoch: [74/1000], Loss: 0.0103, Dev: 0.6727\n",
+            "Epoch: [75/1000], Loss: 0.0102, Dev: 0.6730\n",
+            "Epoch: [76/1000], Loss: 0.0101, Dev: 0.6733\n",
+            "Epoch: [77/1000], Loss: 0.0099, Dev: 0.6736\n",
+            "Epoch: [78/1000], Loss: 0.0098, Dev: 0.6740\n",
+            "Epoch: [79/1000], Loss: 0.0097, Dev: 0.6743\n",
+            "Epoch: [80/1000], Loss: 0.0096, Dev: 0.6743\n",
+            "Epoch: [81/1000], Loss: 0.0095, Dev: 0.6749\n",
+            "Epoch: [82/1000], Loss: 0.0093, Dev: 0.6752\n",
+            "Epoch: [83/1000], Loss: 0.0092, Dev: 0.6752\n",
+            "Epoch: [84/1000], Loss: 0.0091, Dev: 0.6752\n",
+            "Epoch: [85/1000], Loss: 0.0090, Dev: 0.6755\n",
+            "Epoch: [86/1000], Loss: 0.0089, Dev: 0.6758\n",
+            "Epoch: [87/1000], Loss: 0.0088, Dev: 0.6755\n",
+            "Epoch: [88/1000], Loss: 0.0087, Dev: 0.6755\n",
+            "Epoch: [89/1000], Loss: 0.0086, Dev: 0.6752\n",
+            "Epoch: [90/1000], Loss: 0.0086, Dev: 0.6755\n",
+            "Epoch: [91/1000], Loss: 0.0085, Dev: 0.6752\n",
+            "Epoch: [92/1000], Loss: 0.0084, Dev: 0.6758\n",
+            "Epoch: [93/1000], Loss: 0.0083, Dev: 0.6755\n",
+            "Epoch: [94/1000], Loss: 0.0082, Dev: 0.6761\n",
+            "Epoch: [95/1000], Loss: 0.0081, Dev: 0.6761\n",
+            "Epoch: [96/1000], Loss: 0.0081, Dev: 0.6761\n",
+            "Epoch: [97/1000], Loss: 0.0080, Dev: 0.6761\n",
+            "Epoch: [98/1000], Loss: 0.0079, Dev: 0.6761\n",
+            "Epoch: [99/1000], Loss: 0.0078, Dev: 0.6765\n",
+            "Epoch: [100/1000], Loss: 0.0077, Dev: 0.6765\n",
+            "Epoch: [101/1000], Loss: 0.0077, Dev: 0.6771\n",
+            "Epoch: [102/1000], Loss: 0.0076, Dev: 0.6771\n",
+            "Epoch: [103/1000], Loss: 0.0075, Dev: 0.6774\n",
+            "Epoch: [104/1000], Loss: 0.0075, Dev: 0.6774\n",
+            "Epoch: [105/1000], Loss: 0.0074, Dev: 0.6774\n",
+            "Epoch: [106/1000], Loss: 0.0073, Dev: 0.6774\n",
+            "Epoch: [107/1000], Loss: 0.0073, Dev: 0.6774\n",
+            "Epoch: [108/1000], Loss: 0.0072, Dev: 0.6774\n",
+            "Epoch: [109/1000], Loss: 0.0071, Dev: 0.6774\n",
+            "Epoch: [110/1000], Loss: 0.0071, Dev: 0.6774\n",
+            "Epoch: [111/1000], Loss: 0.0070, Dev: 0.6774\n",
+            "Epoch: [112/1000], Loss: 0.0070, Dev: 0.6774\n",
+            "Epoch: [113/1000], Loss: 0.0069, Dev: 0.6774\n",
+            "Accuracy of the best combination: 0.7577367927477336\n",
+            "the best learning rate: 1.0\n",
+            "the best L2 regularisation weight: 0.0001\n",
+            "the number of epochs: 94\n"
+          ],
+          "name": "stdout"
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "id": "jD5TSfviQOxv",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        ""
+      ],
+      "execution_count": 0,
+      "outputs": []
+    },
+    {
+      "metadata": {
+        "id": "CYpwNflwGsrU",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "# Automatic Evaluation [don't change!]"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "6zDrPphzsTBf",
+        "colab_type": "text"
+      },
+      "cell_type": "markdown",
+      "source": [
+        "## Validity Check\n",
+        "This is a way for you to check whether you accidentially renamed answer variables or functions that we will use for automatic evaluation. Note that this is not a comprehensive list and we do not check here whether you accidentially changed the function signatures, so failing this validity check is only a sufficient condition for telling you something went wrong."
+      ]
+    },
+    {
+      "metadata": {
+        "id": "VEnoXoVjsVQ_",
+        "colab_type": "code",
+        "colab": {}
+      },
+      "cell_type": "code",
+      "source": [
+        "for answer in [Q1, Q2, Q3, Q4, Q5, Q6, Q7, Q8, Q9, Q10, QFormulation]:\n",
+        "  assert isinstance(answer, str)\n",
+        "\n",
+        "for fun in [\n",
+        "    construct_scaled_identity, \n",
+        "    mean_diagonal, \n",
+        "    bottom_right_matrix,\n",
+        "    transpose_sum,\n",
+        "    matrixvector1,\n",
+        "    matrixvector2,\n",
+        "    matrixvector3,\n",
+        "    matrixvector4,\n",
+        "    matrixvector5,\n",
+        "    fw,\n",
+        "    bw,\n",
+        "    SortBy,\n",
+        "    collapse_mr_dot_and_lowercase,\n",
+        "    LogisticRegressionMeanPooling,\n",
+        "    add_features,\n",
+        "    accuracy,\n",
+        "    training_loop\n",
+        "    ]:\n",
+        "  assert callable(fun)"
+      ],
+      "execution_count": 0,
+      "outputs": []
+    }
+  ]
+}
